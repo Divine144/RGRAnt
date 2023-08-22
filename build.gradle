@@ -12,6 +12,7 @@ group = mod_base_package // http://maven.apache.org/guides/mini/guide-naming-con
 archivesBaseName = mod_id
 hundredMedia.mcVersion = minecraft_version
 
+
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 jarJar.enable()
@@ -137,6 +138,24 @@ dependencies {
     // Capability Syncer
     hundredMedia.addJarJarDep('dev._100media.capabilitysyncer:capabilitysyncer', capabilitysyncer_version, capabilitysyncer_version_range)
 
+    // 100 Media Morphs
+    hundredMedia.addJarJarDep('dev._100media.hundredmediamorphs:hundredmediamorphs', hundredmediamorphs_version, hundredmediamorphs_version_range, 'fat', "1.20.1")
+
+    // Geckolib
+    hundredMedia.addJarJarDep('software.bernie.geckolib:geckolib-forge-1.20', geckolib_version, geckolib_version_range, null, null)
+
+    // 100 Media Geckolib
+    hundredMedia.addJarJarDep('dev._100media.hundredmediageckolib:hundredmediageckolib', hundredmediageckolib_version, hundredmediageckolib_version_range, null, '1.20.1')
+
+    // 100 Media Abilities
+    hundredMedia.addJarJarDep('dev._100media.hundredmediaabilities:hundredmediaabilities', hundredmediaabilities_version, hundredmediaabilities_version_range, 'fat', '1.20.1')
+
+    // 100 Media Quests
+    hundredMedia.addJarJarDep('dev._100media.hundredmediaquests:hundredmediaquests', hundredmediaquests_version, hundredmediaquests_version_range, null, '1.20.1')
+
+/*    // 100 Media Utility
+    hundredMedia.addJarJarDep('com.nyfaria.hmutility:hmutility', hmutility_version, hmutility_version_range, null, '1.19.2')*/
+
     // Suggestion Provider Fix
 //    runtimeOnly fg.deobf("com.harleyoconnor:suggestion-provider-fix:suggestion-provider-fix-1.20.1-1.0.0")
 }
@@ -144,9 +163,9 @@ dependencies {
 def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta', "${mod_id}.mixins.json".toString()]
 def intoTargets = ["$rootDir/out/production/resources/", "$rootDir/out/production/${project.name}.main/", "$rootDir/bin/main/"]
 def replaceProperties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version,
-        mod_authors: mod_authors, mod_description: mod_description,
-        minecraft_version_range: minecraft_version_range, forge_version_range: forge_version_range,
-        loader_version_range: loader_version_range]
+                         mod_authors: mod_authors, mod_description: mod_description,
+                         minecraft_version_range: minecraft_version_range, forge_version_range: forge_version_range,
+                         loader_version_range: loader_version_range]
 processResources {
     inputs.properties replaceProperties
     replaceProperties.put 'project', project
