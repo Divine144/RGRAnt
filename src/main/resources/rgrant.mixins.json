@@ -3,7 +3,11 @@
   "package": "com.divinity.hmedia.rgrant.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "${mod_id}.refmap.json",
-  "mixins": [],
-  "client": [],
+  "mixins": [
+    "RamTargetMixin"
+  ],
+  "client": [
+    "GameRendererMixin"
+  ],
   "minVersion": "0.8.5"
 }

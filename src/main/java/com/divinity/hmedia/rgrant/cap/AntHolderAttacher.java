@@ -18,11 +18,11 @@ public class AntHolderAttacher extends CapabilityAttacher {
     private static final Class<AntHolder> CAPABILITY_CLASS = AntHolder.class;
 
     @SuppressWarnings("ConstantConditions")
-    public static AntHolder getExampleHolderUnwrap(Entity player) {
-        return getExampleHolder(player).orElse(null);
+    public static AntHolder getAntHolderUnwrap(Entity player) {
+        return getAntHolder(player).orElse(null);
     }
 
-    public static LazyOptional<AntHolder> getExampleHolder(Entity player) {
+    public static LazyOptional<AntHolder> getAntHolder(Entity player) {
         return player.getCapability(EXAMPLE_CAPABILITY);
     }
 
@@ -32,6 +32,6 @@ public class AntHolderAttacher extends CapabilityAttacher {
 
     public static void register() {
         CapabilityAttacher.registerCapability(CAPABILITY_CLASS);
-        CapabilityAttacher.registerEntityAttacher(LivingEntity.class, AntHolderAttacher::attach, AntHolderAttacher::getExampleHolder);
+        CapabilityAttacher.registerEntityAttacher(LivingEntity.class, AntHolderAttacher::attach, AntHolderAttacher::getAntHolder);
     }
 }

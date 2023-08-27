@@ -1,6 +1,7 @@
 package com.divinity.hmedia.rgrant.quest;
 
 import com.divinity.hmedia.rgrant.init.AbilityInit;
+import com.divinity.hmedia.rgrant.init.ItemInit;
 import com.divinity.hmedia.rgrant.quest.goal.AntArmyKillEndermanGoal;
 import com.divinity.hmedia.rgrant.quest.goal.TradeArmorerGoal;
 import com.divinity.hmedia.rgrant.quest.reward.AbilityQuestReward;
@@ -8,6 +9,7 @@ import dev._100media.hundredmediaquests.goal.KillPlayersGoal;
 import dev._100media.hundredmediaquests.goal.QuestGoal;
 import dev._100media.hundredmediaquests.quest.Quest;
 import dev._100media.hundredmediaquests.quest.QuestType;
+import dev._100media.hundredmediaquests.reward.ItemQuestReward;
 import dev._100media.hundredmediaquests.reward.QuestReward;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class MindControlQuest extends Quest {
     @Override
     protected List<QuestReward> initializeRewards() {
         List<QuestReward> rewards = new ArrayList<>();
-        rewards.add(new AbilityQuestReward(AbilityInit.MIND_CONTROL));
+        rewards.add(new ItemQuestReward(ItemInit.MIND_CONTROL.get().getDefaultInstance()));
         return rewards;
     }
 }

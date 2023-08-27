@@ -119,6 +119,10 @@ repositories {
     maven {
         url = 'https://harleyoconnor.com/maven'
     }
+
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 mixin {
@@ -133,6 +137,7 @@ mixin {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 
     // Capability Syncer

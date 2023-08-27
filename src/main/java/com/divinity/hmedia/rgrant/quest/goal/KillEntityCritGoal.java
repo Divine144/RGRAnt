@@ -20,7 +20,7 @@ public class KillEntityCritGoal extends KillSpecificTypeGoal {
         boolean canCrit = flag && killer.fallDistance > 0.0F && !killer.onGround() && !killer.onClimbable() && !killer.isInWater() && !killer.hasEffect(MobEffects.BLINDNESS) && !killer.isPassenger();
         canCrit = canCrit && !killer.isSprinting();
         if (canCrit) {
-            return super.tallyKill(entity, source, killer, direct);
+            return super.tallyKill(entity, source);
         }
         return false;
     }

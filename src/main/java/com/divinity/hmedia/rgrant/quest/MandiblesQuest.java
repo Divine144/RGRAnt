@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.quest;
 
+import com.divinity.hmedia.rgrant.init.ItemInit;
 import com.divinity.hmedia.rgrant.quest.goal.HitVillagersGoal;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
 import dev._100media.hundredmediaquests.goal.HarvestBlocksGoal;

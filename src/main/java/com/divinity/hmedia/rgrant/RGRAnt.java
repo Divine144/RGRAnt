@@ -32,17 +32,19 @@ public class RGRAnt {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ExampleConfig.CONFIG_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ExampleClientConfig.CLIENT_SPEC);
 
-        AbilityInit.ABILITIES.register(modBus);
         ItemInit.ITEMS.register(modBus);
         EntityInit.ENTITIES.register(modBus);
-        MorphInit.MORPHS.register(modBus);
         BlockInit.BLOCKS.register(modBus);
-        MenuInit.MENUS.register(modBus);
-        QuestInit.QUESTS.register(modBus);
-        MarkerInit.MARKERS.register(modBus);
-        BlockInit.BLOCK_ENTITIES.register(modBus);
         SoundInit.SOUNDS.register(modBus);
+        BlockInit.BLOCK_ENTITIES.register(modBus);
+        MenuInit.MENUS.register(modBus);
         CreativeModeTabInit.CREATIVE_MODE_TABS.register(modBus);
+        MorphInit.MORPHS.register(modBus);
+        AbilityInit.ABILITIES.register(modBus);
+        MarkerInit.MARKERS.register(modBus);
+        QuestInit.QUESTS.register(modBus);
+        SkillInit.SKILLS.register(modBus);
+        SkillInit.SKILL_TREES.register(modBus);
         AntHolderAttacher.register();
     }
 

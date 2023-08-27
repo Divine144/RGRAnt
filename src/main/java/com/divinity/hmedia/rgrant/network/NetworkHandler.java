@@ -26,7 +26,7 @@ public class NetworkHandler {
                 .add(SimpleEntityCapabilityStatusPacket::register)
                 .build();
 
-        SimpleEntityCapabilityStatusPacket.registerRetriever(AntHolderAttacher.EXAMPLE_RL, AntHolderAttacher::getExampleHolderUnwrap);
+        SimpleEntityCapabilityStatusPacket.registerRetriever(AntHolderAttacher.EXAMPLE_RL, AntHolderAttacher::getAntHolderUnwrap);
 
         packets.forEach(consumer -> consumer.accept(INSTANCE, getNextId()));
     }

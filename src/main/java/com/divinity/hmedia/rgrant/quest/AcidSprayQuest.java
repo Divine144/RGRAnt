@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.quest;
 
+import com.divinity.hmedia.rgrant.init.ItemInit;
 import com.divinity.hmedia.rgrant.quest.goal.AquireAdvancementGoal;
 import com.divinity.hmedia.rgrant.quest.goal.KillEntityCritGoal;
 import com.divinity.hmedia.rgrant.quest.goal.KillPlayersMandiblesGoal;
@@ -36,7 +37,7 @@ public class AcidSprayQuest extends Quest {
     @Override
     protected List<QuestReward> initializeRewards() {
         List<QuestReward> rewards = new ArrayList<>();
-        rewards.add(new ItemQuestReward(new ItemStack(ItemInit.MANDIBLES.get())));
+        rewards.add(new ItemQuestReward(new ItemStack(ItemInit.ACID_SPRAY.get())));
         return rewards;
     }
 }
