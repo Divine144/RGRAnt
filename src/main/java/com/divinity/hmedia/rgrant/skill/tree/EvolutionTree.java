@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.skill.tree;
 
+import com.divinity.hmedia.rgrant.init.MenuInit;
 import dev._100media.hundredmediaquests.skill.Skill;
 import dev._100media.hundredmediaquests.skill.defaults.MenuProvidingTree;
 import net.minecraft.network.chat.MutableComponent;

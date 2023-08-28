@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.quest.reward;
 
+import com.divinity.hmedia.rgrant.init.SkillInit;
 import dev._100media.hundredmediaabilities.ability.Ability;
 import dev._100media.hundredmediaquests.reward.QuestReward;
 import net.minecraft.server.level.ServerLevel;

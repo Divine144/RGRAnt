@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.cap;
 
+import com.divinity.hmedia.rgrant.item.EchoLocationItem;
 import com.divinity.hmedia.rgrant.network.NetworkHandler;
 import dev._100media.capabilitysyncer.core.EntityCapability;
 import dev._100media.capabilitysyncer.network.EntityCapabilityStatusPacket;
@@ -7,14 +8,22 @@ import dev._100media.capabilitysyncer.network.SimpleEntityCapabilityStatusPacket
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import dev._100media.hundredmediamorphs.morph.Morph;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.simple.SimpleChannel;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class AntHolder extends EntityCapability {
 
     private int mindControlTicks;
+    private Size currentSize = Size.SMALL;
 
     protected AntHolder(Entity entity) {
         super(entity);
@@ -24,12 +33,14 @@ public class AntHolder extends EntityCapability {
     public CompoundTag serializeNBT(boolean savingToDisk) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("mindControlTicks", this.mindControlTicks);
+        tag.putInt("currentSize", currentSize.ordinal());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt, boolean readingFromDisk) {
         this.mindControlTicks = nbt.getInt("mindControlTicks");
+        this.currentSize = Size.values()[nbt.getInt("currentSize")];
     }
 
     @Override
@@ -97,27 +108,56 @@ public class AntHolder extends EntityCapability {
         return mindControlTicks > 0;
     }
 
-/*    public Size getSize() {
-
+    public Size getCurrentSize() {
+        return currentSize;
     }
 
-    public EntityDimensions getDimensionsForSize() {
-        return switch (getSize()) {
-            case NONE -> {
-                if (this.entity instanceof LivingEntity e) {
-                    Morph morph = MorphHolderAttacher.getCurrentMorphUnwrap(e);
-                    if (morph != null && morph.getDimensions())
-                }
+    public void setCurrentSize(Size currentSize) {
+        this.currentSize = currentSize;
+        if (entity instanceof ServerPlayer player) {
+            var holder = MorphHolderAttacher.getMorphHolderUnwrap(player);
+            if (holder != null) {
+                holder.setDimensionsOverride(currentSize.dimensions, true);
             }
         }
-    }*/
+        updateTracking();
+    }
+
+    public void setCurrentSizeNoDimensionUpdate(Size currentSize) {
+        this.currentSize = currentSize;
+        updateTracking();
+    }
 
     public enum Size {
-        NONE,
-        SMALLEST,
-        SMALL,
-        MEDIUM,
-        LARGE,
-        XLARGE
+        SMALLEST(EntityDimensions.scalable(0.65f, 0.65f)),
+        SMALL(EntityDimensions.scalable(1f, 1f)),
+        MEDIUM(EntityDimensions.scalable(1.5f, 2f)),
+        LARGE(EntityDimensions.scalable(2f, 3f)),
+        X_LARGE(EntityDimensions.scalable(2f, 6f));
+
+        private final EntityDimensions dimensions;
+
+        Size(EntityDimensions dimensions) {
+            this.dimensions = dimensions;
+        }
+
+        public boolean isCurrentSize(Morph morph) {
+            var otherDimensions = morph.getDimensions(null, Pose.STANDING);
+            return Morph.dimensionsEqual(dimensions, otherDimensions);
+        }
+
+        public Size next() {
+            if (ordinal() + 1 >= values().length) {
+                return this;
+            }
+            return values()[(ordinal() + 1) % values().length];
+        }
+
+        public Size previous() {
+            if (ordinal() - 1 < 0) {
+                return this;
+            }
+            return values()[(ordinal() - 1) % values().length];
+        }
     }
 }

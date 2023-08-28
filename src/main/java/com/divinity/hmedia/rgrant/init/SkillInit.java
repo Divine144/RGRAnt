@@ -176,10 +176,10 @@ public class SkillInit {
                     new ItemSkillRequirement(() -> Items.GHAST_TEAR, 3)
             ),
             player -> {
-                unlockAbility(player, AbilityInit.ECHO_LOCATION.get());
+
             },
             player -> {
-                removeAbility(player, AbilityInit.ECHO_LOCATION.get());
+
             }
     ));
 

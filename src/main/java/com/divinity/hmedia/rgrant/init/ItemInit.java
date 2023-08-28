@@ -21,6 +21,8 @@ public class ItemInit {
     public static final RegistryObject<Item> LEAF_CUTTER_TOOLS = ITEMS.register("leaf_cutter_tools", () -> new Item(new AnimatedItemProperties().stacksTo(1)));
     public static final RegistryObject<Item> VENOMOUS_STING = ITEMS.register("venomous_sting", () -> new VenomousStingItem(new AnimatedItemProperties().stacksTo(1)));
 
+    public static final RegistryObject<Item> ECHO_LOCATION = ITEMS.register("echo_location", () -> new EchoLocationItem(new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<Item> MIND_CONTROL = ITEMS.register("mind_control", () -> new MindControlItem(new Item.Properties().stacksTo(1)));
 
 

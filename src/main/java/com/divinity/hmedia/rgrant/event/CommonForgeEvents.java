@@ -9,20 +9,28 @@ import com.divinity.hmedia.rgrant.quest.goal.*;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
 import dev._100media.hundredmediaabilities.capability.MarkerHolderAttacher;
 import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod.EventBusSubscriber(modid = RGRAnt.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonForgeEvents {
@@ -39,6 +47,13 @@ public class CommonForgeEvents {
             }
             return false;
         });
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLeave(EntityLeaveLevelEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            AntHolderAttacher.getAntHolder(player).ifPresent(p -> p.setMindControlTicks(0));
+        }
     }
 
     @SubscribeEvent
@@ -84,6 +99,15 @@ public class CommonForgeEvents {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            if (event.player instanceof LocalPlayer player && event.phase == TickEvent.Phase.END) {
+                var connection = Minecraft.getInstance().getConnection();
+                if (connection != null) {
+
+
+                }
+            }
+        }
         if (event.player instanceof ServerPlayer player && event.phase == TickEvent.Phase.END) {
             MarkerHolderAttacher.getMarkerHolder(player).ifPresent(p -> {
                 if (p.hasMarker(MarkerInit.MANDIBLES_MARKER.get())) {

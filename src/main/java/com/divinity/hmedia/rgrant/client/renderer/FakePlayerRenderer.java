@@ -4,10 +4,16 @@ import com.divinity.hmedia.rgrant.client.layer.FakePlayerItemInHandLayer;
 import com.divinity.hmedia.rgrant.entity.MindControlledPlayerEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -28,8 +34,10 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.UUID;
 
 public class FakePlayerRenderer extends LivingEntityRenderer<LivingEntity, PlayerModel<LivingEntity>> {
 
@@ -59,12 +67,18 @@ public class FakePlayerRenderer extends LivingEntityRenderer<LivingEntity, Playe
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull LivingEntity pEntity) {
         if (pEntity instanceof MindControlledPlayerEntity mindControlledPlayerEntity) {
-            Player player = mindControlledPlayerEntity.getOwner();
-            if (player instanceof AbstractClientPlayer abstractClientPlayer) {
-                return abstractClientPlayer.getSkinTextureLocation();
+            UUID id = mindControlledPlayerEntity.getOwnerUUID();
+            if (id != null) {
+                var connection = Minecraft.getInstance().getConnection();
+                if (connection != null) {
+                    PlayerInfo info = connection.getPlayerInfo(id);
+                    if (info != null) {
+                        return info.getSkinLocation();
+                    }
+                }
             }
         }
-        return ZOMBIE_LOCATION; // temp location as a fallback, since this is nonnull
+        return ZOMBIE_LOCATION;
     }
 
     @Override
@@ -83,21 +97,24 @@ public class FakePlayerRenderer extends LivingEntityRenderer<LivingEntity, Playe
     protected void renderNameTag(LivingEntity pEntity, Component pDisplayName, PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight) {
         double d0 = this.entityRenderDispatcher.distanceToSqr(pEntity);
         if (pEntity instanceof MindControlledPlayerEntity mindControlledPlayerEntity) {
-            Player player = mindControlledPlayerEntity.getOwner();
-            if (player != null) {
-                pMatrixStack.pushPose();
-                if (d0 < 100.0D) {
-                    Scoreboard scoreboard = player.getScoreboard();
-                    Objective objective = scoreboard.getDisplayObjective(2);
-                    if (objective != null) {
-                        Score score = scoreboard.getOrCreatePlayerScore(player.getScoreboardName(), objective);
-                        super.renderNameTag(player, Component.literal(Integer.toString(score.getScore())).append(CommonComponents.SPACE).append(objective.getDisplayName()), pMatrixStack, pBuffer, pPackedLight);
-                        pMatrixStack.translate(0.0F, 9.0F * 1.15F * 0.025F, 0.0F);
+            UUID id = mindControlledPlayerEntity.getOwnerUUID();
+            if (id != null) {
+                var connection = Minecraft.getInstance().getConnection();
+                if (connection != null) {
+                    PlayerInfo info = connection.getPlayerInfo(id);
+                    if (info != null) {
+                        pMatrixStack.pushPose();
+                        if (d0 < 100.0D) {
+                            String playerName = info.getProfile().getName();
+                            LocalPlayer player = Minecraft.getInstance().player;
+                            if (player != null) {
+                                super.renderNameTag(player, Component.literal(playerName).withStyle(ChatFormatting.RED), pMatrixStack, pBuffer, pPackedLight);
+                            }
+                            pMatrixStack.translate(0.0F, 9.0F * 1.15F * 0.025F, 0.0F);
+                        }
+                        pMatrixStack.popPose();
                     }
                 }
-
-                super.renderNameTag(pEntity, pDisplayName, pMatrixStack, pBuffer, pPackedLight);
-                pMatrixStack.popPose();
             }
         }
     }

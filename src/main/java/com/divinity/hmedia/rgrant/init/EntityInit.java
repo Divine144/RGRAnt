@@ -19,13 +19,13 @@ import java.util.function.Supplier;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = RGRAnt.MODID)
 public class EntityInit {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, RGRAnt.MODID);
+    private static final List<AttributesRegister<?>> attributeSuppliers = new ArrayList<>();
 
     public static final RegistryObject<EntityType<AntEntity>> ANT_ENTITY = registerEntity("ant_entity", () ->
             EntityType.Builder.of(AntEntity::new, MobCategory.MISC).sized(0.5F, 0.5F), AntEntity::createAttributes);
 
     public static final RegistryObject<EntityType<MindControlledPlayerEntity>> MIND_CONTROLLED_PLAYER = registerEntity("mind_controlled_player", () ->
             EntityType.Builder.of(MindControlledPlayerEntity::new, MobCategory.MISC).sized(0.6f, 1.5f), MindControlledPlayerEntity::createAttributes);
-    private static final List<AttributesRegister<?>> attributeSuppliers = new ArrayList<>();
 
     private static <T extends Entity> RegistryObject<EntityType<T>> registerEntity(String name, Supplier<EntityType.Builder<T>> supplier) {
         return ENTITIES.register(name, () -> supplier.get().build(RGRAnt.MODID + ":" + name));

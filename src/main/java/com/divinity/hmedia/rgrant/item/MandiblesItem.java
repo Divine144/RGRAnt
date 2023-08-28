@@ -60,6 +60,7 @@ public class MandiblesItem extends AnimatedSwordItem {
         ItemStack itemStack = getHeadForEntity(entity);
         if (!itemStack.isEmpty()) {
             playerIn.getInventory().add(itemStack);
+            entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
             return InteractionResult.SUCCESS;
         }
         else if (entity instanceof Player player) {
@@ -68,10 +69,13 @@ public class MandiblesItem extends AnimatedSwordItem {
             playerHeadStack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gameprofile));
             playerIn.getInventory().add(playerHeadStack);
             MarkerHolderAttacher.getMarkerHolder(player).ifPresent(h -> h.addMarker(MarkerInit.MANDIBLES_MARKER.get(), false));
+            player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
             return InteractionResult.SUCCESS;
         }
-        else playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
-        entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+        else {
+            playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
+            entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+        }
         return InteractionResult.CONSUME;
     }
 

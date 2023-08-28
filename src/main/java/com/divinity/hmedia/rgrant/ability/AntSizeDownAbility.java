@@ -8,20 +8,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-public class AntSizeUpAbility extends Ability {
+public class AntSizeDownAbility extends Ability {
 
     @Override
     public void executePressed(ServerLevel level, ServerPlayer player) {
         var holder = AntHolderAttacher.getAntHolderUnwrap(player);
         if (holder != null) {
             AntHolder.Size size = holder.getCurrentSize();
-            if (size == size.next()) {
-                player.displayClientMessage(Component.literal("Cannot Increase Size Further").withStyle(ChatFormatting.RED), true);
+            if (size == size.previous()) {
+                player.displayClientMessage(Component.literal("Cannot Decrease Size Further").withStyle(ChatFormatting.RED), true);
             }
             else {
-                holder.setCurrentSize(size.next());
-                player.displayClientMessage(Component.literal("Size Increased!").withStyle(ChatFormatting.GREEN), true);
-
+                holder.setCurrentSize(size.previous());
+                player.displayClientMessage(Component.literal("Size Decreased!").withStyle(ChatFormatting.GREEN), true);
             }
         }
         super.executePressed(level, player);

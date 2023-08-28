@@ -1,11 +1,13 @@
 package com.divinity.hmedia.rgrant.entity;
 
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
+import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -20,6 +22,10 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -29,7 +35,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-// TODO: Implement Kill Aura and Speed
+// TODO: Implement Kill Aura
 public class MindControlledPlayerEntity extends PathfinderMob {
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(MindControlledPlayerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -61,6 +67,9 @@ public class MindControlledPlayerEntity extends PathfinderMob {
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
+            if (!this.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 3, false, false, false));
+            }
             Player player = this.getOwner();
             if (player == null) discard();
             else {
@@ -87,11 +96,48 @@ public class MindControlledPlayerEntity extends PathfinderMob {
     }
 
     @Override
+    public void aiStep() {
+        this.updateSwingTime();
+        super.aiStep();
+    }
+
+    @Override
+    public boolean doHurtTarget(Entity pEntity) {
+        float f = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        float f1 = (float) this.getAttributeValue(Attributes.ATTACK_KNOCKBACK);
+        if (pEntity instanceof LivingEntity livingEntity) {
+            f += EnchantmentHelper.getDamageBonus(this.getMainHandItem(), livingEntity.getMobType());
+            f1 += (float)EnchantmentHelper.getKnockbackBonus(this);
+        }
+        int i = EnchantmentHelper.getFireAspect(this);
+        if (i > 0) {
+            pEntity.setSecondsOnFire(i * 4);
+        }
+        Player owner = this.getOwner();
+        if (owner != null) {
+            boolean flag = pEntity.hurt(this.damageSources().playerAttack(owner), f);
+            if (flag) {
+                if (f1 > 0.0F && pEntity instanceof LivingEntity livingEntity) {
+                    livingEntity.knockback(f1 * 0.5F, Mth.sin(this.getYRot() * ((float) Math.PI / 180F)), -Mth.cos(this.getYRot() * ((float) Math.PI / 180F)));
+                    this.setDeltaMovement(this.getDeltaMovement().multiply(0.6D, 1.0D, 0.6D));
+                }
+                if (pEntity instanceof Player player) {
+                    this.maybeDisableShield(player, this.getMainHandItem(), player.isUsingItem() ? player.getUseItem() : ItemStack.EMPTY);
+                }
+                this.doEnchantDamageEffects(owner, pEntity);
+                owner.setLastHurtMob(pEntity);
+            }
+            return flag;
+        }
+        return false;
+    }
+
+    @Override
     public void swing(InteractionHand pHand) {
         super.swing(pHand);
         Player player = this.getOwner();
         if (player != null) {
-            player.swing(pHand); // Imitate swinging like the player is doing it themselves (idk if this will work if player is spectating an entity)
+            player.swing(pHand); // Imitate swinging like the player is doing it themselves
         }
     }
 
@@ -100,7 +146,7 @@ public class MindControlledPlayerEntity extends PathfinderMob {
         if (!this.level().isClientSide) {
             Player player = this.getOwner();
             if (player instanceof ServerPlayer serverPlayer) {
-                this.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, -1, 0));
+                this.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, -1, 0, false, false, false));
                 serverPlayer.setGameMode(GameType.SURVIVAL);
                 serverPlayer.copyPosition(this);
                 AntHolderAttacher.getAntHolder(serverPlayer).ifPresent(h -> h.setMindControlTicks(0));
@@ -110,22 +156,9 @@ public class MindControlledPlayerEntity extends PathfinderMob {
         }
     }
 
-    @Nullable
-    @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
-        Player player = this.getOwner();
-        if (player != null) {
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                this.setItemSlot(slot, player.getItemBySlot(slot));
-            }
-//            this.setItemSlot(EquipmentSlot.HEAD, ); TODO: Set head to mind control armor
-        }
-        return pSpawnData;
-    }
-
     @Override
     protected void registerGoals() {
-        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, false));
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, false, p -> MorphHolderAttacher.getCurrentMorph(p).isEmpty()));
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0F, true));
         this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, LivingEntity.class, 10F));
@@ -154,5 +187,15 @@ public class MindControlledPlayerEntity extends PathfinderMob {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 20.0D).add(Attributes.ATTACK_DAMAGE, 2D).add(Attributes.MOVEMENT_SPEED, (double)0.3F);
+    }
+
+    private void maybeDisableShield(Player pPlayer, ItemStack pMobItemStack, ItemStack pPlayerItemStack) {
+        if (!pMobItemStack.isEmpty() && !pPlayerItemStack.isEmpty() && pMobItemStack.getItem() instanceof AxeItem && pPlayerItemStack.is(Items.SHIELD)) {
+            float f = 0.25F + (float)EnchantmentHelper.getBlockEfficiency(this) * 0.05F;
+            if (this.random.nextFloat() < f) {
+                pPlayer.getCooldowns().addCooldown(Items.SHIELD, 100);
+                this.level().broadcastEntityEvent(pPlayer, (byte)30);
+            }
+        }
     }
 }
