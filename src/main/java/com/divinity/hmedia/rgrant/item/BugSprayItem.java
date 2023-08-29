@@ -28,6 +28,7 @@ public class BugSprayItem extends SimpleAnimatedItem {
             player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
             // TODO: Add sound here
             return InteractionResult.CONSUME;
+
         }
         return InteractionResult.SUCCESS;
     }

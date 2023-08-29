@@ -18,6 +18,7 @@ import dev._100media.hundredmediaquests.skill.defaults.SimpleSkill;
 import dev._100media.hundredmediaquests.skill.requirements.ItemSkillRequirement;
 import dev._100media.hundredmediaquests.skill.requirements.ItemTagSkillRequirement;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -26,6 +27,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public class SkillInit {
     public static final DeferredRegister<SkillTree> SKILL_TREES = DeferredRegister.create(HMQSkillsInit.SKILL_TREES.getRegistryName(), RGRAnt.MODID);
@@ -46,7 +48,15 @@ public class SkillInit {
                     new ItemSkillRequirement(() -> Items.LAPIS_BLOCK, 3),
                     new ItemSkillRequirement(() -> Items.NAME_TAG, 1)
             ),
-            MorphInit.BLACK_ANT
+            MorphInit.BLACK_ANT,
+            player -> {
+                unlockAbility(player, AbilityInit.SIZE_UP.get());
+                unlockAbility(player, AbilityInit.SIZE_DOWN.get());
+            },
+            player -> {
+                removeAbility(player, AbilityInit.SIZE_UP.get());
+                removeAbility(player, AbilityInit.SIZE_DOWN.get());
+            }
     ));
     public static final RegistryObject<Skill> FIRE_ANT = SKILLS.register("fire_ant", () -> new MorphSkill(
             Component.literal("Fire Ant"),
@@ -135,7 +145,7 @@ public class SkillInit {
     ));
     // Utility
     public static final RegistryObject<Skill> CAMOUFLAGE = SKILLS.register("camouflage", () -> new SimpleSkill(
-            Component.literal("Camouflage"),
+            Component.literal("CamouflageAbility"),
             Component.literal("""
                     Whatever block is being looked at when this ability is used; the player will turn into that block.
                     Press the ability again to deactivate.
@@ -176,7 +186,7 @@ public class SkillInit {
                     new ItemSkillRequirement(() -> Items.GHAST_TEAR, 3)
             ),
             player -> {
-
+                player.getInventory().add(new ItemStack(ItemInit.ECHO_LOCATION.get()));
             },
             player -> {
 
@@ -190,7 +200,6 @@ public class SkillInit {
                     These ants act as a shield that can absorb up to 50 damage.
                     """),
             Arrays.asList(
-
                     new ItemTagSkillRequirement(() -> TagInit.CORAL, 32, Component.literal("Coral")),
                     new ItemSkillRequirement(() -> Items.AXOLOTL_BUCKET, 3),
                     new ItemTagSkillRequirement(() -> TagInit.HORSE_ARMOR, 3, Component.literal("Horse Armor"))

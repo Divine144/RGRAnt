@@ -69,34 +69,38 @@ public class EchoLocationItem extends Item {
             }
         }
         if (found == null)
-            pPlayer.displayClientMessage(Component.literal(type.name() + " not found."), false);
+            pPlayer.displayClientMessage(Component.literal(type.name())
+                    .withStyle(Style.EMPTY.withColor(type.textColor))
+                    .append(Component.literal(" not found")
+                            .withStyle(ChatFormatting.WHITE)), false);
         else {
-            pPlayer.displayClientMessage(Component.literal(type.name() + " found: " + found.getX() + " " + found.getY() + " " + found.getZ())
-                    .withStyle(Style.EMPTY.withColor(type.textColor)), false);
+            pPlayer.displayClientMessage(Component.literal(type.name())
+                    .withStyle(Style.EMPTY.withColor(type.textColor))
+                    .append(Component.literal(" found: " + found.getX() + " " + found.getY() + " " + found.getZ())
+                    .withStyle(ChatFormatting.WHITE)), false);
         }
         return InteractionResultHolder.consume(itemStack);
     }
 
-    // TODO: FIX
     @SuppressWarnings("ConstantConditions")
     static enum OreType {
-        COAL(ChatFormatting.BLACK.getColor(), Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE),
-        COPPER(ChatFormatting.GOLD.getColor(), Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE),
-        IRON(ChatFormatting.WHITE.getColor(), Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE),
-        GOLD(ChatFormatting.YELLOW.getColor(), Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE),
-        LAPIS(ChatFormatting.BLUE.getColor(), Blocks.LAPIS_ORE, Blocks.DEEPSLATE_LAPIS_ORE),
-        REDSTONE(ChatFormatting.RED.getColor(), Blocks.REDSTONE_ORE, Blocks.DEEPSLATE_REDSTONE_ORE),
-        DIAMOND(ChatFormatting.AQUA.getColor(), Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE),
-        QUARTZ(ChatFormatting.WHITE.getColor(), Blocks.NETHER_QUARTZ_ORE),
-        EMERALD(ChatFormatting.GREEN.getColor(), Blocks.EMERALD_ORE),
-        NETHERITE(10506797, Blocks.ANCIENT_DEBRIS);
+        COAL(0x000000, Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE),
+        COPPER(0xB87333, Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE),
+        IRON(0xFFFFFF, Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE),
+        GOLD(0xF4F72A, Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE),
+        LAPIS(0x2F36FA, Blocks.LAPIS_ORE, Blocks.DEEPSLATE_LAPIS_ORE),
+        REDSTONE(0xFA2F2F, Blocks.REDSTONE_ORE, Blocks.DEEPSLATE_REDSTONE_ORE),
+        DIAMOND(0x27F2F2, Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE),
+        QUARTZ(0xFFFFFF, Blocks.NETHER_QUARTZ_ORE),
+        EMERALD(0x47F520, Blocks.EMERALD_ORE),
+        NETHERITE(0x8B4513, Blocks.ANCIENT_DEBRIS);
 
         private final List<Block> blockTypes;
         private final TextColor textColor;
 
         OreType(int color, Block... blocks) {
             this.blockTypes = Arrays.asList(blocks);
-            this.textColor = TextColor.fromRgb(Integer.parseInt("0x" + Integer.toHexString(color)));
+            this.textColor = TextColor.fromRgb(color);
         }
 
         public boolean is(BlockState state) {

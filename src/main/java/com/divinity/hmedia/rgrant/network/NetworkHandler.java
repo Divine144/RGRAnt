@@ -1,6 +1,7 @@
 package com.divinity.hmedia.rgrant.network;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
+import com.divinity.hmedia.rgrant.network.serverbound.EscapeNetPacket;
 import com.google.common.collect.ImmutableList;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import dev._100media.capabilitysyncer.network.SimpleEntityCapabilityStatusPacket;
@@ -24,6 +25,7 @@ public class NetworkHandler {
     public static void register() {
         List<BiConsumer<SimpleChannel, Integer>> packets = ImmutableList.<BiConsumer<SimpleChannel, Integer>>builder()
                 .add(SimpleEntityCapabilityStatusPacket::register)
+                .add(EscapeNetPacket::register)
                 .build();
 
         SimpleEntityCapabilityStatusPacket.registerRetriever(AntHolderAttacher.EXAMPLE_RL, AntHolderAttacher::getAntHolderUnwrap);

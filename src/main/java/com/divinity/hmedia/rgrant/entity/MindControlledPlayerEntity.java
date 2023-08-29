@@ -97,7 +97,7 @@ public class MindControlledPlayerEntity extends PathfinderMob {
 
     @Override
     public void aiStep() {
-        this.updateSwingTime();
+        this.updateSwingTime(); // Makes attack animations sync properly on client
         super.aiStep();
     }
 
@@ -159,7 +159,12 @@ public class MindControlledPlayerEntity extends PathfinderMob {
     @Override
     protected void registerGoals() {
         this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, false, p -> MorphHolderAttacher.getCurrentMorph(p).isEmpty()));
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0F, true));
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0F, true) {
+            @Override
+            protected void resetAttackCooldown() {
+                super.resetAttackCooldown();
+            }
+        });
         this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, LivingEntity.class, 10F));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.7F));

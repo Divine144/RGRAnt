@@ -8,22 +8,32 @@ import dev._100media.capabilitysyncer.network.SimpleEntityCapabilityStatusPacket
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import dev._100media.hundredmediamorphs.morph.Morph;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class AntHolder extends EntityCapability {
 
     private int mindControlTicks;
     private Size currentSize = Size.SMALL;
+    private static final int ESCAPE_REQUIRED_SWINGS = 5;
+    private UUID captured = null;
+
+    private Block camouflagedBlock = Blocks.AIR;
+
+    private int toSwing = 0;
 
     protected AntHolder(Entity entity) {
         super(entity);
@@ -34,6 +44,11 @@ public class AntHolder extends EntityCapability {
         CompoundTag tag = new CompoundTag();
         tag.putInt("mindControlTicks", this.mindControlTicks);
         tag.putInt("currentSize", currentSize.ordinal());
+        tag.putInt("toSwing", toSwing);
+        if (captured != null) {
+            tag.putUUID("captured", captured);
+        }
+        tag.putInt("block", Block.getId(camouflagedBlock.defaultBlockState()));
         return tag;
     }
 
@@ -41,6 +56,12 @@ public class AntHolder extends EntityCapability {
     public void deserializeNBT(CompoundTag nbt, boolean readingFromDisk) {
         this.mindControlTicks = nbt.getInt("mindControlTicks");
         this.currentSize = Size.values()[nbt.getInt("currentSize")];
+        toSwing = nbt.getInt("toSwing");
+        captured = null;
+        if (nbt.contains("captured")) {
+            captured = nbt.getUUID("captured");
+        }
+        this.camouflagedBlock = Block.stateById(nbt.getInt("block")).getBlock();
     }
 
     @Override
@@ -82,6 +103,39 @@ public class AntHolder extends EntityCapability {
         }
         wasDay = day;
     }*/
+
+    public void updateToSwing() {
+        toSwing = ESCAPE_REQUIRED_SWINGS;
+        updateTracking();
+    }
+
+    public void decrementToSwing() {
+        --toSwing;
+        updateTracking();
+    }
+
+    public int getToSwing() {
+        return toSwing;
+    }
+
+    public void capture(LivingEntity living) {
+        captured = living.getUUID();
+        living.setNoGravity(true);
+    }
+
+    public void unCapture() {
+        if (getCaptured() instanceof LivingEntity living) {
+            living.setNoGravity(false);
+        }
+        captured = null;
+    }
+
+    public Entity getCaptured() {
+        if (captured != null && entity.level() instanceof ServerLevel level) {
+            return level.getEntity(captured);
+        }
+        return null;
+    }
 
     @Override
     public SimpleChannel getNetworkChannel() {
@@ -125,6 +179,15 @@ public class AntHolder extends EntityCapability {
 
     public void setCurrentSizeNoDimensionUpdate(Size currentSize) {
         this.currentSize = currentSize;
+        updateTracking();
+    }
+
+    public Block getCamouflagedBlock() {
+        return camouflagedBlock;
+    }
+
+    public void setCamouflagedBlock(Block camouflagedBlock) {
+        this.camouflagedBlock = camouflagedBlock;
         updateTracking();
     }
 

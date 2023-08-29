@@ -37,6 +37,7 @@ public class MindControlItem extends Item {
                     }
                     //            this.setItemSlot(EquipmentSlot.HEAD, ); TODO: Set head to mind control armor
                     serverPlayer.serverLevel().addFreshEntity(fakePlayer);
+                    // TODO: Add sound
                 }
             }
             return InteractionResult.CONSUME;

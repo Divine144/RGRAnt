@@ -2,16 +2,19 @@ package com.divinity.hmedia.rgrant.item;
 
 import dev._100media.hundredmediageckolib.item.animated.AnimatedItemProperties;
 import dev._100media.hundredmediageckolib.item.tool.AnimatedAxeItem;
+import dev._100media.hundredmediageckolib.item.tool.AnimatedSwordItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,20 +22,39 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
 import java.util.function.Consumer;
 
-public class VenomousStingItem extends AnimatedAxeItem {
+public class VenomousStingItem extends AnimatedSwordItem {
 
     public VenomousStingItem(AnimatedItemProperties properties) {
-        super(Tiers.DIAMOND, 5.0F, 0F, properties);
+        super(Tiers.DIAMOND, 5, 0F, properties);
+
     }
 
-    @Override
-    public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
-        super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
-    }
-
+    // TODO: Change this to implement projectile
     @Override
     public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged) {
-        super.releaseUsing(pStack, pLevel, pLivingEntity, pTimeCharged);
+        if (pLivingEntity instanceof Player player) {
+            ItemStack itemstack = player.getProjectile(pStack);
+            int i = this.getUseDuration(pStack) - pTimeCharged;
+            if (i < 0) return;
+
+            if (!itemstack.isEmpty()) {
+                if (itemstack.isEmpty()) {
+                    itemstack = new ItemStack(Items.ARROW);
+                }
+                if (!pLevel.isClientSide) {
+                    ArrowItem arrowitem = (ArrowItem)(itemstack.getItem() instanceof ArrowItem ? itemstack.getItem() : Items.ARROW);
+                    AbstractArrow abstractarrow = arrowitem.createArrow(pLevel, itemstack, player);
+   /*                 abstractarrow = customArrow(abstractarrow);*/
+                    abstractarrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 1.0F);
+                    if (player.getAbilities().instabuild && (itemstack.is(Items.SPECTRAL_ARROW) || itemstack.is(Items.TIPPED_ARROW))) {
+                        abstractarrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+                    }
+                    pLevel.addFreshEntity(abstractarrow);
+                }
+                pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+                player.awardStat(Stats.ITEM_USED.get(this));
+            }
+        }
     }
 
     @Override

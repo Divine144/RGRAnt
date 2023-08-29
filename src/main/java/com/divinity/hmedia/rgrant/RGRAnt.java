@@ -45,6 +45,7 @@ public class RGRAnt {
         QuestInit.QUESTS.register(modBus);
         SkillInit.SKILLS.register(modBus);
         SkillInit.SKILL_TREES.register(modBus);
+        EffectInit.EFFECTS.register(modBus);
         AntHolderAttacher.register();
     }
 

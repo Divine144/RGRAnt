@@ -5,6 +5,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -31,6 +33,16 @@ public class AntEntity extends PathfinderMob {
     @Override
     public boolean isAlliedTo(Entity pEntity) {
         return pEntity instanceof AntEntity || (this.getOwner() != null && pEntity == this.getOwner());
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!this.level().isClientSide) {
+            if (!this.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 5, false, false, false));
+            }
+        }
     }
 
     @Override

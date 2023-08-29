@@ -28,11 +28,11 @@ public class ModTagProvider {
 
         @Override
         protected void addTags(HolderLookup.Provider pProvider) {
-/*            tag(TagInit.CORAL)
+            tag(TagInit.CORAL)
                     .add(asResourceKey(Items.TUBE_CORAL), asResourceKey(Items.BRAIN_CORAL), asResourceKey(Items.BUBBLE_CORAL), asResourceKey(Items.FIRE_CORAL), asResourceKey(Items.HORN_CORAL),
                             asResourceKey(Items.DEAD_TUBE_CORAL), asResourceKey(Items.DEAD_BRAIN_CORAL), asResourceKey(Items.DEAD_BUBBLE_CORAL), asResourceKey(Items.DEAD_FIRE_CORAL), asResourceKey(Items.DEAD_HORN_CORAL));
             tag(TagInit.HORSE_ARMOR)
-                    .add(asResourceKey(Items.LEATHER_HORSE_ARMOR), asResourceKey(Items.GOLDEN_HORSE_ARMOR), asResourceKey(Items.IRON_HORSE_ARMOR), asResourceKey(Items.DIAMOND_HORSE_ARMOR));*/
+                    .add(asResourceKey(Items.LEATHER_HORSE_ARMOR), asResourceKey(Items.GOLDEN_HORSE_ARMOR), asResourceKey(Items.IRON_HORSE_ARMOR), asResourceKey(Items.DIAMOND_HORSE_ARMOR));
         }
 
         private static ResourceKey<Item> asResourceKey(Item item) {

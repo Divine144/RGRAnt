@@ -7,16 +7,17 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,30 @@ public class AntUtils {
 
     public static boolean hasItemEitherHands(Player player, Item item) {
         return player.getItemInHand(InteractionHand.MAIN_HAND).getItem() == item || player.getItemInHand(InteractionHand.OFF_HAND).getItem() == item;
+    }
+
+    public static void scanHitWithFollowup(Entity shooter, double range, boolean hitFluids, Consumer<HitResult> followup) {
+        Predicate<Entity> filter = e -> true;
+        Vec3 eyePos = shooter.getEyePosition(1);
+        Vec3 lookDirection = shooter.getLookAngle();
+        Vec3 traceVec = eyePos.add(lookDirection.scale(range));
+        ClipContext.Fluid mode;
+        if (hitFluids) {
+            mode = ClipContext.Fluid.ANY;
+        } else {
+            mode = ClipContext.Fluid.NONE;
+        }
+        HitResult result = shooter.level().clip(new ClipContext(eyePos, traceVec, ClipContext.Block.COLLIDER, mode, shooter));
+        Vec3 resultVec = traceVec;
+        if (result.getType() != HitResult.Type.MISS) {
+            resultVec = result.getLocation();
+        }
+        AABB box = new AABB(eyePos, resultVec);
+        HitResult projectileResult = ProjectileUtil.getEntityHitResult(shooter.level(), shooter, eyePos, resultVec, box, filter);
+        if (projectileResult != null) {
+            result = projectileResult;
+        }
+        followup.accept(result);
     }
 
     public static <T extends QuestGoal> void addToGenericQuestGoal(ServerPlayer player, Class<T> clazz) {
@@ -65,6 +90,22 @@ public class AntUtils {
             }
         }
         return entity == null ? null : new EntityHitResult(entity);
+    }
+
+    public static BlockHitResult blockTrace(LivingEntity livingEntity, ClipContext.Fluid rayTraceFluid, int range, boolean downOrFace) {
+        Level level = livingEntity.level();
+        ClipContext context;
+        Vec3 start = new Vec3(livingEntity.getX(), livingEntity.getY() + livingEntity.getEyeHeight(), livingEntity.getZ());
+        Vec3 look;
+
+        if (!downOrFace) {
+            look = livingEntity.getLookAngle();
+        } else {
+            look = new Vec3(0, -range, 0);
+        }
+        Vec3 end = new Vec3(livingEntity.getX() + look.x * (double) range, livingEntity.getY() + livingEntity.getEyeHeight() + look.y * (double) range, livingEntity.getZ() + look.z * (double) range);
+        context = new ClipContext(start, end, ClipContext.Block.COLLIDER, rayTraceFluid, livingEntity);
+        return level.clip(context);
     }
 
     /**
