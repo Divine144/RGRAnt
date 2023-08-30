@@ -14,7 +14,7 @@ public class ItemInit {
 
     public static final RegistryObject<Item> MANDIBLES = ITEMS.register("mandibles", () -> new MandiblesItem(new AnimatedItemProperties().stacksTo(1)));
 
-    public static final RegistryObject<Item> ACID_SPRAY = ITEMS.register("acid_spray", () -> new AcidSprayItem(new AnimatedItemProperties().stacksTo(1)));
+    public static final RegistryObject<Item> ACID_SPRAY = ITEMS.register("acid_spray", () -> new AcidSprayItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> BUG_SPRAY = ITEMS.register("bug_spray", () -> new BugSprayItem(new AnimatedItemProperties().stacksTo(1)));
 

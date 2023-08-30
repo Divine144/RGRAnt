@@ -1,8 +1,10 @@
 package com.divinity.hmedia.rgrant.init;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
+import com.divinity.hmedia.rgrant.entity.AcidProjectileEntity;
 import com.divinity.hmedia.rgrant.entity.AntEntity;
 import com.divinity.hmedia.rgrant.entity.MindControlledPlayerEntity;
+import com.divinity.hmedia.rgrant.entity.StingerProjectileEntity;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -26,6 +28,14 @@ public class EntityInit {
 
     public static final RegistryObject<EntityType<MindControlledPlayerEntity>> MIND_CONTROLLED_PLAYER = registerEntity("mind_controlled_player", () ->
             EntityType.Builder.of(MindControlledPlayerEntity::new, MobCategory.MISC).sized(0.6f, 1.5f), MindControlledPlayerEntity::createAttributes);
+
+    public static final RegistryObject<EntityType<AcidProjectileEntity>> ACID_ENTITY = registerEntity("acid_entity", () ->
+            EntityType.Builder.of(AcidProjectileEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F));
+
+    public static final RegistryObject<EntityType<StingerProjectileEntity>> STINGER_ENTITY = registerEntity("stinger_entity", () ->
+            EntityType.Builder.of(StingerProjectileEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F));
 
     private static <T extends Entity> RegistryObject<EntityType<T>> registerEntity(String name, Supplier<EntityType.Builder<T>> supplier) {
         return ENTITIES.register(name, () -> supplier.get().build(RGRAnt.MODID + ":" + name));

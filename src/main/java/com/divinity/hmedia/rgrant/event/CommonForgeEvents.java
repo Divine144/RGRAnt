@@ -3,6 +3,7 @@ package com.divinity.hmedia.rgrant.event;
 import com.divinity.hmedia.rgrant.RGRAnt;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import com.divinity.hmedia.rgrant.entity.AntEntity;
+import com.divinity.hmedia.rgrant.init.AbilityInit;
 import com.divinity.hmedia.rgrant.init.EffectInit;
 import com.divinity.hmedia.rgrant.init.MarkerInit;
 import com.divinity.hmedia.rgrant.mixin.EntityAccessor;
@@ -10,15 +11,21 @@ import com.divinity.hmedia.rgrant.network.serverbound.EscapeNetPacket;
 import com.divinity.hmedia.rgrant.network.NetworkHandler;
 import com.divinity.hmedia.rgrant.quest.goal.*;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
+import dev._100media.hundredmediaabilities.capability.AbilityHolderAttacher;
 import dev._100media.hundredmediaabilities.capability.MarkerHolderAttacher;
+import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.animal.camel.Camel;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.npc.Villager;
@@ -41,6 +48,8 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.TradeWithVillagerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = RGRAnt.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonForgeEvents {
@@ -127,6 +136,22 @@ public class CommonForgeEvents {
                 AntUtils.addToGenericQuestGoal(player, HitVillagersGoal.class);
             }
         }
+        if (event.getEntity() instanceof ServerPlayer player) {
+            AntHolderAttacher.getAntHolder(player).ifPresent(cap -> {
+                if (cap.getRemainingShield() > 0) {
+                    // TODO: sound for shield
+//                    player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundInit.FLAMING_SHIELD_DAMAGE.get(), SoundSource.PLAYERS, 1, 1);
+
+                    cap.setRemainingShield(cap.getRemainingShield() - event.getAmount());
+
+                    if (cap.getRemainingShield() <= 0) {
+                        AbilityHolderAttacher.getAbilityHolder(player).ifPresent(abilityHolder -> abilityHolder.addCooldown(AbilityInit.SWARM_SHIELD.get(), true));
+                    }
+                    event.setCanceled(true);
+                }
+            });
+
+        }
     }
 
     @SubscribeEvent
@@ -152,16 +177,37 @@ public class CommonForgeEvents {
                         player.displayClientMessage(Component.literal(s).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), true);
                     }
                 }
+                if (cap.getGigaAntTicks() > 0) {
+                    cap.setGigaAntTicks(cap.getGigaAntTicks() - 1);
+                    List<Player> targets = player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(15), e -> e != player && MorphHolderAttacher.getCurrentMorph(e).map(m -> !m.getDescriptionId().contains("phoenix")).orElse(true) && e.distanceToSqr(player) <= 10 * 10);
+                    if (!targets.isEmpty()) {
+                        Player target = targets.get(0);
+                        player.attack(target);
+                        player.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+                    }
+                    if (cap.getGigaAntTicks() <= 0) {
+                        AbilityHolderAttacher.getAbilityHolder(player).ifPresent(p ->  {
+                            if (p.isAbilityActive(AbilityInit.GIGA_ANT.get())) {
+                                AbilityInit.GIGA_ANT.get().executeToggle(player.serverLevel(), player, false);
+                            }
+                        });
+                    }
+                }
                 if (cap.getCaptured() instanceof LivingEntity entity) {
+                    if (!entity.hasEffect(EffectInit.NETTED.get())) {
+                        cap.unCapture();
+                        return;
+                    }
                     Vec3 view = player.getViewVector(1.0f);
                     Vec3 position = player.getEyePosition();
-                    Vec3 destination = position.add(view.scale(2.0f));
+                    Vec3 destination = position.add(view.scale(2f));
                     Vec3 lerpDest = vector3dLerp(entity.position(), destination, 0.6f).add(0, -(entity.getEyeHeight() / 2), 0);
                     Vec3 movement = lerpDest.subtract(entity.position());
                     if (entity instanceof EntityAccessor accessor) {
                         movement = accessor.invokeCollide(movement);
                     }
-                    entity.moveTo(entity.position().add(movement));
+                    var pos = entity.position().add(movement);
+                    entity.moveTo(pos);
                     entity.hurtMarked = true;
                     entity.fallDistance = 0;
                 }
@@ -195,7 +241,6 @@ public class CommonForgeEvents {
                 if (holder.getCaptured() instanceof LivingEntity) {
                     holder.unCapture();
                 }
-                holder.capture(living);
                 event.setCancellationResult(InteractionResult.SUCCESS);
                 event.setCanceled(true);
             });

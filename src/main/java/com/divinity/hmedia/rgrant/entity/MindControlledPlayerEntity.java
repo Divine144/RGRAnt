@@ -1,6 +1,7 @@
 package com.divinity.hmedia.rgrant.entity;
 
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
+import com.divinity.hmedia.rgrant.entity.goal.AttackEntityGoal;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -35,7 +36,6 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-// TODO: Implement Kill Aura
 public class MindControlledPlayerEntity extends PathfinderMob {
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(MindControlledPlayerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -158,13 +158,8 @@ public class MindControlledPlayerEntity extends PathfinderMob {
 
     @Override
     protected void registerGoals() {
-        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, false, p -> MorphHolderAttacher.getCurrentMorph(p).isEmpty()));
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0F, true) {
-            @Override
-            protected void resetAttackCooldown() {
-                super.resetAttackCooldown();
-            }
-        });
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Player.class, true, p -> MorphHolderAttacher.getCurrentMorph(p).isEmpty()));
+        this.goalSelector.addGoal(1, new AttackEntityGoal(this, 1.0F, false));
         this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, LivingEntity.class, 10F));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.7F));

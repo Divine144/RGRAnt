@@ -4,6 +4,8 @@ import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
 import dev._100media.hundredmediaquests.goal.QuestGoal;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +52,28 @@ public class AntUtils {
             result = projectileResult;
         }
         followup.accept(result);
+    }
+
+    public static void amplifyCurrentEffect(ServerPlayer player, boolean isDivision, MobEffect... effects) {
+        Arrays.stream(effects).forEach(effect -> amplifyCurrentEffect(player, isDivision, effect));
+    }
+
+    public static void amplifyCurrentEffect(ServerPlayer player, boolean isDivision, MobEffect effect) {
+        MobEffectInstance instance = player.getEffect(effect);
+        if (instance != null) {
+            amplifyCurrentEffect(player, isDivision ? instance.getAmplifier() / 2 : instance.getAmplifier() * 2, effect);
+        }
+    }
+
+    public static void amplifyCurrentEffect(ServerPlayer player, int amplificationIncreaseFactor, MobEffect... effects) {
+        Arrays.stream(effects).forEach(effect -> amplifyCurrentEffect(player, amplificationIncreaseFactor, effect));
+    }
+
+    public static void amplifyCurrentEffect(ServerPlayer player, int amplificationIncreaseFactor, MobEffect effect) {
+        MobEffectInstance instance = player.getEffect(effect);
+        if (instance != null) {
+            player.addEffect(new MobEffectInstance(effect, instance.getDuration(), instance.getAmplifier() + amplificationIncreaseFactor, false, false, false));
+        }
     }
 
     public static <T extends QuestGoal> void addToGenericQuestGoal(ServerPlayer player, Class<T> clazz) {

@@ -2,22 +2,18 @@ package com.divinity.hmedia.rgrant.event;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
+import com.divinity.hmedia.rgrant.client.renderer.AcidEntityRenderer;
 import com.divinity.hmedia.rgrant.client.renderer.FakePlayerRenderer;
-import com.divinity.hmedia.rgrant.init.EffectInit;
-import com.divinity.hmedia.rgrant.init.EntityInit;
-import com.divinity.hmedia.rgrant.init.MenuInit;
-import com.divinity.hmedia.rgrant.init.SkillInit;
+import com.divinity.hmedia.rgrant.client.renderer.StingerEntityRenderer;
+import com.divinity.hmedia.rgrant.init.*;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import dev._100media.hundredmediageckolib.client.animatable.IHasGeoRenderer;
 import dev._100media.hundredmediageckolib.client.model.SimpleGeoPlayerModel;
 import dev._100media.hundredmediageckolib.client.renderer.GeoPlayerRenderer;
-import dev._100media.hundredmediageckolib.client.renderer.layer.GeoPlayerArmorLayer;
 import dev._100media.hundredmediageckolib.client.renderer.layer.GeoSeparatedEntityRenderLayer;
-import dev._100media.hundredmediamorphs.client.model.AdvancedGeoPlayerModel;
-import dev._100media.hundredmediamorphs.client.renderer.AdvancedGeoPlayerRenderer;
+import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import dev._100media.hundredmediamorphs.client.renderer.MorphRenderers;
 import dev._100media.hundredmediamorphs.morph.Morph;
 import dev._100media.hundredmediaquests.client.screen.QuestSkillScreen;
@@ -28,16 +24,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
@@ -50,7 +43,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 
 import java.util.Arrays;
@@ -68,6 +60,8 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityInit.MIND_CONTROLLED_PLAYER.get(), FakePlayerRenderer::new);
+        event.registerEntityRenderer(EntityInit.ACID_ENTITY.get(), AcidEntityRenderer::new);
+        event.registerEntityRenderer(EntityInit.STINGER_ENTITY.get(), StingerEntityRenderer::new);
     }
 
     @SubscribeEvent
@@ -137,14 +131,16 @@ public class ClientModEvents {
                         var holder = AntHolderAttacher.getAntHolderUnwrap(player);
                         if (holder != null) {
                             poseStack.pushPose();
-                            poseStack.scale(scale, scale, scale);
-                            if (player.getVehicle() != null) {
-                                poseStack.translate(0, 0, 0);
-                            }
                             if (holder.getCamouflagedBlock() != Blocks.AIR) {
                                 Minecraft.getInstance().getBlockRenderer().renderSingleBlock(holder.getCamouflagedBlock().defaultBlockState(), poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
                             }
-                            else super.render(player, animatable1, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+                            else {
+                                if (player.getVehicle() != null) {
+                                    poseStack.translate(0, 0, 0);
+                                }
+                                poseStack.scale(scale, scale, scale);
+                                super.render(player, animatable1, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+                            }
                             poseStack.popPose();
 
                         }
@@ -152,7 +148,40 @@ public class ClientModEvents {
                 }
             };
             renderer.addRenderLayer(new GeoSeparatedEntityRenderLayer<>(renderer) {
+                private static final ResourceLocation SHIELD_MODEL = new ResourceLocation(RGRAnt.MODID, "geo/entity/ant_shield.geo.json");
+                private static final ResourceLocation SHIELD_TEXTURE = new ResourceLocation(RGRAnt.MODID, "textures/entity/ant_shield.png");
 
+                @Override
+                public void renderPre(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, AbstractClientPlayer entity, T animatable, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+                    AntHolderAttacher.getAntHolder(entity).ifPresent(cap -> {
+                        if (cap.getRemainingShield() <= 0) {
+                            return;
+                        }
+                        RenderType renderType =  RenderType.eyes(SHIELD_TEXTURE);
+                        poseStack.pushPose();
+                        MorphHolderAttacher.getCurrentMorph(entity).ifPresent(m -> {
+                            if (m == MorphInit.BABY_ANT.get()) {
+                                poseStack.scale(1, 1, 1);
+                            }
+                            else if (m == MorphInit.BLACK_ANT.get()) {
+                                poseStack.scale(1.15F, 1.15F, 1.15F);
+                            }
+                            else if (m == MorphInit.FIRE_ANT.get()) {
+                                poseStack.scale(3.5F, 3.5F, 3.5F);
+                            }
+                            else if (m == MorphInit.KING_ANT.get()) {
+                                poseStack.scale(3.5F, 3.5F, 3.5F);
+                            }
+                            else if (m == MorphInit.OMEGA_ANT.get()) {
+                                poseStack.scale(3.5F, 3.5F, 3.5F);
+                            }
+                        });
+                        poseStack.translate(0, 0, 0);
+                        renderer.reRender(this.getEntityModel().getBakedModel(SHIELD_MODEL), poseStack, bufferSource, animatable, renderType, bufferSource.getBuffer(renderType), partialTick, packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+                        poseStack.popPose();
+                    });
+
+                }
             });
             return renderer;
         });

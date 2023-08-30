@@ -1,8 +1,10 @@
 {
   "block.rgrant.hundred_media": "Hundred Media",
+  "entity.rgrant.acid_entity": "Acid Entity",
   "entity.rgrant.ant_entity": "Ant Entity",
   "entity.rgrant.mind_controlled_player": "Mind Controlled Player",
   "item.rgrant.acid_spray": "Acid Spray",
+  "item.rgrant.bug_net": "Bug Net",
   "item.rgrant.bug_spray": "Bug Spray",
   "item.rgrant.echo_location": "Echo Location",
   "item.rgrant.leaf_cutter_tools": "Leaf Cutter Tools",

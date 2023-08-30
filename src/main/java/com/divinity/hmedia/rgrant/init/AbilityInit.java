@@ -1,10 +1,7 @@
 package com.divinity.hmedia.rgrant.init;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
-import com.divinity.hmedia.rgrant.ability.AntArmyAbility;
-import com.divinity.hmedia.rgrant.ability.AntSizeDownAbility;
-import com.divinity.hmedia.rgrant.ability.AntSizeUpAbility;
-import com.divinity.hmedia.rgrant.ability.CamouflageAbility;
+import com.divinity.hmedia.rgrant.ability.*;
 import dev._100media.hundredmediaabilities.HundredMediaAbilitiesMod;
 import dev._100media.hundredmediaabilities.ability.Ability;
 import net.minecraft.resources.ResourceLocation;
@@ -23,9 +20,9 @@ public class AbilityInit {
 
     public static final RegistryObject<Ability> CAMOUFLAGE = ABILITIES.register("camouflage", CamouflageAbility::new);
 
-    public static final RegistryObject<Ability> SWARM_SHIELD = ABILITIES.register("swarm_shield", Ability::new);
+    public static final RegistryObject<Ability> SWARM_SHIELD = ABILITIES.register("swarm_shield", SwarmShieldAbility::new);
 
-    public static final RegistryObject<Ability> GIGA_ANT = ABILITIES.register("giga_ant", Ability::new);
+    public static final RegistryObject<Ability> GIGA_ANT = ABILITIES.register("giga_ant", GigaAntAbility::new);
 
 
 

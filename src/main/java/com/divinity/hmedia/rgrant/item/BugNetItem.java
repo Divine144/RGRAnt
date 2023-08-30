@@ -33,10 +33,11 @@ public class BugNetItem extends Item implements GeoItem {
     @Override
     public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity entity, InteractionHand hand) {
         if (entity.level().isClientSide) return InteractionResult.SUCCESS;
-        if (entity instanceof ServerPlayer player && MorphHolderAttacher.getCurrentMorph(player).isPresent()) {
+        if (entity instanceof ServerPlayer player) {
             player.addEffect(new MobEffectInstance(EffectInit.NETTED.get(), 20 * 60, 0));
             player.setDeltaMovement(Vec3.ZERO);
             AntHolderAttacher.getAntHolder(player).ifPresent(AntHolder::updateToSwing);
+            AntHolderAttacher.getAntHolder(playerIn).ifPresent(p -> p.capture(player));
             return InteractionResult.CONSUME;
         }
         return InteractionResult.SUCCESS;

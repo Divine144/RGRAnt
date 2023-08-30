@@ -33,6 +33,10 @@ public class AntHolder extends EntityCapability {
 
     private Block camouflagedBlock = Blocks.AIR;
 
+    private double remainingShield;
+
+    private int gigaAntTicks = 0;
+
     private int toSwing = 0;
 
     protected AntHolder(Entity entity) {
@@ -45,6 +49,8 @@ public class AntHolder extends EntityCapability {
         tag.putInt("mindControlTicks", this.mindControlTicks);
         tag.putInt("currentSize", currentSize.ordinal());
         tag.putInt("toSwing", toSwing);
+        tag.putDouble("remainingShield", this.remainingShield);
+        tag.putInt("gigaAntTicks", this.gigaAntTicks);
         if (captured != null) {
             tag.putUUID("captured", captured);
         }
@@ -57,6 +63,8 @@ public class AntHolder extends EntityCapability {
         this.mindControlTicks = nbt.getInt("mindControlTicks");
         this.currentSize = Size.values()[nbt.getInt("currentSize")];
         toSwing = nbt.getInt("toSwing");
+        this.remainingShield = nbt.getDouble("remainingShield");
+        this.gigaAntTicks = nbt.getInt("gigaAntTicks");
         captured = null;
         if (nbt.contains("captured")) {
             captured = nbt.getUUID("captured");
@@ -103,6 +111,15 @@ public class AntHolder extends EntityCapability {
         }
         wasDay = day;
     }*/
+
+    public double getRemainingShield() {
+        return remainingShield;
+    }
+
+    public void setRemainingShield(double remainingShield) {
+        this.remainingShield = Math.max(0, remainingShield);
+        updateTracking();
+    }
 
     public void updateToSwing() {
         toSwing = ESCAPE_REQUIRED_SWINGS;
@@ -189,6 +206,14 @@ public class AntHolder extends EntityCapability {
     public void setCamouflagedBlock(Block camouflagedBlock) {
         this.camouflagedBlock = camouflagedBlock;
         updateTracking();
+    }
+
+    public int getGigaAntTicks() {
+        return gigaAntTicks;
+    }
+
+    public void setGigaAntTicks(int gigaAntTicks) {
+        this.gigaAntTicks = gigaAntTicks;
     }
 
     public enum Size {

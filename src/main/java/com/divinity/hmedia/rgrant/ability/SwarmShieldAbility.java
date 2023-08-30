@@ -1,24 +1,19 @@
 package com.divinity.hmedia.rgrant.ability;
 
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
-import com.divinity.hmedia.rgrant.init.EntityInit;
 import dev._100media.hundredmediaabilities.ability.Ability;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-public class AntArmyAbility extends Ability {
+public class SwarmShieldAbility extends Ability {
 
     @Override
-    public void executePressed(ServerLevel level, ServerPlayer player) {
-        for (int i = 0; i < 10; i++) {
-            var entity = EntityInit.ANT_ENTITY.get().create(level);
-            if (entity != null) {
-                entity.setPos(player.position());
-                entity.setOwnerUUID(player.getUUID());
-                level.addFreshEntity(entity);
-            }
+    public void executeToggle(ServerLevel level, ServerPlayer player, boolean toggledOn) {
+        var holder = AntHolderAttacher.getAntHolderUnwrap(player);
+        if (holder != null) {
+            double remainingShield = holder.getRemainingShield();
+            holder.setRemainingShield(toggledOn ? (remainingShield > 0 ? remainingShield : 50) : 0);
         }
-        super.executePressed(level, player);
     }
 
     @Override
@@ -31,7 +26,12 @@ public class AntArmyAbility extends Ability {
     }
 
     @Override
+    public boolean isToggleAbility() {
+        return true;
+    }
+
+    @Override
     public int getCooldownDuration() {
-        return 20 * 10;
+        return 20 * 30;
     }
 }
