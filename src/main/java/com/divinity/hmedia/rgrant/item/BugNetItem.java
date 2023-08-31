@@ -40,7 +40,7 @@ public class BugNetItem extends Item implements GeoItem {
 
     @Override
     public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity entity, InteractionHand hand) {
-        if (entity.level().isClientSide) return InteractionResult.SUCCESS;
+        if (entity.level().isClientSide) return InteractionResult.PASS;
         if (entity instanceof ServerPlayer player) {
             player.addEffect(new MobEffectInstance(EffectInit.NETTED.get(), 20 * 60, 0));
             player.setDeltaMovement(Vec3.ZERO);
@@ -78,11 +78,9 @@ public class BugNetItem extends Item implements GeoItem {
                             poseStack.pushPose();
                             switch (transformType) {
                                 case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {
-                                    poseStack.translate(-0.07, -0.2, -0.3);
+                                    poseStack.translate(-0.01, -0.2, 0.1);
                                 }
-                                case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> {
-
-                                }
+                                case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> {}
                             }
                             super.renderByItem(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay);
                             poseStack.popPose();
@@ -92,8 +90,8 @@ public class BugNetItem extends Item implements GeoItem {
                         protected void renderInGui(ItemDisplayContext transformType, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
                             poseStack.pushPose();
                             poseStack.mulPose(Axis.YP.rotationDegrees(90));
-                            poseStack.scale(1.2f, 1.2f, 1.2f);
-                            poseStack.translate(0.05, -0.25, -0.1);
+                            poseStack.scale(0.75f, 0.75f, 0.75f);
+                            poseStack.translate(0.05, -0.5, 0.1);
                             super.renderInGui(transformType, poseStack, bufferSource, packedLight, packedOverlay);
                             poseStack.popPose();
                         }

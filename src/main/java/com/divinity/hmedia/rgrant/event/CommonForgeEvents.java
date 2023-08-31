@@ -6,17 +6,22 @@ import com.divinity.hmedia.rgrant.entity.AntEntity;
 import com.divinity.hmedia.rgrant.init.AbilityInit;
 import com.divinity.hmedia.rgrant.init.EffectInit;
 import com.divinity.hmedia.rgrant.init.MarkerInit;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import com.divinity.hmedia.rgrant.mixin.EntityAccessor;
 import com.divinity.hmedia.rgrant.network.serverbound.EscapeNetPacket;
 import com.divinity.hmedia.rgrant.network.NetworkHandler;
 import com.divinity.hmedia.rgrant.quest.goal.*;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import dev._100media.hundredmediaabilities.capability.AbilityHolderAttacher;
 import dev._100media.hundredmediaabilities.capability.MarkerHolderAttacher;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -36,6 +41,7 @@ import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
@@ -66,6 +72,24 @@ public class CommonForgeEvents {
             }
             return false;
         });
+    }
+
+    @SubscribeEvent
+    public static void onRegisterCommands(RegisterCommandsEvent event) {
+        var dispatcher = event.getDispatcher();
+        dispatcher.register(Commands.literal(RGRAnt.MODID)
+                .then(Commands.literal("disableMindControl")
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(context -> {
+                                    var holder = AntHolderAttacher.getAntHolderUnwrap(EntityArgument.getPlayer(context, "player"));
+                                    if (holder != null) {
+                                        holder.setMindControlTicks(0);
+                                    }
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                )
+        );
     }
 
     @SubscribeEvent
@@ -139,8 +163,8 @@ public class CommonForgeEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             AntHolderAttacher.getAntHolder(player).ifPresent(cap -> {
                 if (cap.getRemainingShield() > 0) {
-                    // TODO: sound for shield
-//                    player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundInit.FLAMING_SHIELD_DAMAGE.get(), SoundSource.PLAYERS, 1, 1);
+
+                    player.level().playSound(null, player.blockPosition(), SoundInit.SWARM_SHIELD.get(), SoundSource.PLAYERS, 0.5f, 1f);
 
                     cap.setRemainingShield(cap.getRemainingShield() - event.getAmount());
 

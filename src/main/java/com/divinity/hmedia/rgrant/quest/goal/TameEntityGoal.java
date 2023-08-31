@@ -23,7 +23,7 @@ public class TameEntityGoal extends BasicQuestGoal {
 
     @Override
     public String getDescriptionId() {
-        return "quest.goal.rgrant.kill_" + ForgeRegistries.ENTITY_TYPES.getKey(type).toString() + "_goal";
+        return "quest.goal.rgrant.tame_cat_goal";
     }
     @Override
     public CompoundTag save() {

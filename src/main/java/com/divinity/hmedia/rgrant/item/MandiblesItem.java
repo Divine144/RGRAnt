@@ -1,12 +1,14 @@
 package com.divinity.hmedia.rgrant.item;
 
 import com.divinity.hmedia.rgrant.init.MarkerInit;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import com.mojang.authlib.GameProfile;
 import dev._100media.hundredmediaabilities.capability.MarkerHolderAttacher;
 import dev._100media.hundredmediageckolib.item.animated.AnimatedItemProperties;
 import dev._100media.hundredmediageckolib.item.tool.AnimatedSwordItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -61,6 +63,7 @@ public class MandiblesItem extends AnimatedSwordItem {
         if (!itemStack.isEmpty()) {
             playerIn.getInventory().add(itemStack);
             entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+            playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
             return InteractionResult.SUCCESS;
         }
         else if (entity instanceof Player player) {
@@ -70,11 +73,14 @@ public class MandiblesItem extends AnimatedSwordItem {
             playerIn.getInventory().add(playerHeadStack);
             MarkerHolderAttacher.getMarkerHolder(player).ifPresent(h -> h.addMarker(MarkerInit.MANDIBLES_MARKER.get(), false));
             player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+            playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
             return InteractionResult.SUCCESS;
         }
         else {
             playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
             entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+            playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+
         }
         return InteractionResult.CONSUME;
     }

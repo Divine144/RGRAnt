@@ -40,38 +40,41 @@ public class ModLangProvider extends LanguageProvider {
         MorphInit.MORPHS.getEntries().forEach(this::morphLang);
 
         add("key.rgrant.skill_tree", "Open Skill Tree");
-        add("key.rgrant.money_explosion", "Money Explosion");
-        add("key.rgrant.butler_recall", "Recall Butler");
         add("key.category.rgrant", "RGRAnt");
 
         add("itemGroup.hundredMediaTab", "100 Media");
         // Quest Descriptions
         add("quest.goal.rgrant.ant_army_kill_enderman_goal.description", "Have \"Ant Army\" Ants kill 5 Endermen");
-        add("quest.goal.rgrant.loot_end_ship_goal.description", "Discover and loot an End Ship");
-        add("quest.goal.rgrant.steal_money_goal.description", "Steal $2,500 from players using Exploit The Working Class");
-        add("quest.goal.rgrant.new_look_advancement_goal.description", "Earn the Advancement \"Crafting a New Look\"");
-        add("quest.goal.rgrant.kill_player_coin_cannon.description", "Kill 3 players with the Coin Cannon");
-        add("quest.goal.rgrant.summon_iron_golem_advancement_goal.description", "Earn the Advancement \"Hired Help\"");
-        add("quest.goal.rgrant.light_as_a_rabbit_advancement_goal.description", "Earn the Advancement \"Light as a Rabbit\"");
-        add("quest.goal.rgrant.kill_player_grand_giveaway.description", "Kill 3 Players with the Grand Giveaway");
-        add("quest.goal.rgrant.cure_zombie_villager_advancement_goal.description", "Earn the Advancement \"Zombie Doctor\"");
-        add("quest.goal.rgrant.kill_player_fall_damage.description", "Kill 5 Players with fall damage");
-        add("quest.goal.rgrant.smells_interesting_advancement_goal.description", "Earn the Advancement \"Smells Interesting\"");
-        add("quest.goal.rgrant.harvest_spawner.description", "Harvest two Spawners of any kind");
+        add("quest.goal.rgrant.surge_protector_advancement_goal.description", "Earn the Advancement \"Surge Protector\"");
+        add("quest.goal.rgrant.make_camel_jump_goal.description", "Make a Camel Jump 10 Times");
+        add("quest.goal.rgrant.give_allay_item_goal.description", "Give an Allay Any Item");
+        add("quest.goal.rgrant.goat_lose_horn_goal.description", "Make Goats Lose Their Horns 3 Times");
+        add("quest.goal.rgrant.hit_villagers_quest_goal.description", "Hit Villagers 10 Times");
+        add("quest.goal.rgrant.kill_cave_spider_crit_goal.description", "Kill 15 Cave Spiders with Crits");
+        add("quest.goal.rgrant.kill_players_mandibles_goal.description", "Kill 3 Players while they are affected by the Mandibles");
+        add("quest.goal.rgrant.kill_players_sting_goal.description", "Kill 7 Players with the Venomous Sting");
+        add("quest.goal.rgrant.tame_cat_goal.description", "Tame a Cat");
+        add("quest.goal.rgrant.trade_armorer_goal.description", "Trade with a Max Level Armorer");
+        add("quest.goal.rgrant.harvest_netherrack_goal.description", "Harvest a Piece Of Netherrack");
+        add("quest.goal.rgrant.kill_players_pickaxe_goal.description", "Kill a Player with a Pickaxe");
+        add("quest.goal.rgrant.kill_players_poisoned_goal.description", "Kill 5 Players while they are Poisoned");
+
 
         // Quest Display Descriptions
-        add("quest.goal.rgrant.loot_desert_temple_goal", "Discover and loot a Desert Temple");
-        add("quest.goal.rgrant.loot_end_ship_goal", "Discover and loot an End Ship");
-        add("quest.goal.rgrant.steal_money_goal", "Steal $2,500 from players using Exploit The Working Class");
-        add("quest.goal.rgrant.new_look_advancement_goal", "Earn the Advancement \"Crafting a New Look\"");
-        add("quest.goal.rgrant.kill_player_coin_cannon", "Kill 3 players with the Coin Cannon");
-        add("quest.goal.rgrant.summon_iron_golem_advancement_goal", "Earn the Advancement \"Hired Help\"");
-        add("quest.goal.rgrant.light_as_a_rabbit_advancement_goal", "Earn the Advancement \"Light as a Rabbit\"");
-        add("quest.goal.rgrant.kill_player_grand_giveaway", "Kill 3 Players with the Grand Giveaway");
-        add("quest.goal.rgrant.cure_zombie_villager_advancement_goal", "Earn the Advancement \"Zombie Doctor\"");
-        add("quest.goal.rgrant.kill_player_fall_damage", "Kill 5 Players with fall damage");
-        add("quest.goal.rgrant.smells_interesting_advancement_goal", "Earn the Advancement \"Smells Interesting\"");
-        add("quest.goal.rgrant.harvest_spawner", "Harvest Two Spawners");
+        add("quest.goal.rgrant.ant_army_kill_enderman_goal", "Have \"Ant Army\" Ants kill Endermen");
+        add("quest.goal.rgrant.surge_protector_advancement_goal", "Earn the Advancement \"Surge Protector\"");
+        add("quest.goal.rgrant.make_camel_jump_goal", "Make a Camel Jump 10 Times");
+        add("quest.goal.rgrant.give_allay_item_goal", "Give an Allay Any Item");
+        add("quest.goal.rgrant.goat_lose_horn_goal", "Make Goats Lose Their Horns");
+        add("quest.goal.rgrant.hit_villagers_quest_goal", "Hit Villagers");
+        add("quest.goal.rgrant.kill_cave_spider_crit_goal", "Kill Cave Spiders with Crits");
+        add("quest.goal.rgrant.kill_players_mandibles_goal", "Kill Players affected by the Mandibles");
+        add("quest.goal.rgrant.kill_players_sting_goal", "Kill Players with the Venomous Sting");
+        add("quest.goal.rgrant.tame_cat_goal", "Tame a Cat");
+        add("quest.goal.rgrant.trade_armorer_goal", "Trade with a Max Level Armorer");
+        add("quest.goal.rgrant.harvest_netherrack_goal", "Harvest Netherrack");
+        add("quest.goal.rgrant.kill_players_pickaxe_goal", "Kill a Player with a Pickaxe");
+        add("quest.goal.rgrant.kill_players_poisoned_goal", "Kill Players while they are Poisoned");
     }
 
     protected void itemLang(RegistryObject<Item> entry) {

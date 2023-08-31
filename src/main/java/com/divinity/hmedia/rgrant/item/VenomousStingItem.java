@@ -2,6 +2,7 @@ package com.divinity.hmedia.rgrant.item;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
 import com.divinity.hmedia.rgrant.init.EntityInit;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -69,7 +70,7 @@ public class VenomousStingItem extends SimpleAnimatedItem {
                     player.level().addFreshEntity(entity);
                 }
             }
-            pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + 0.5F);
+            player.level().playSound(null, player.blockPosition(), SoundInit.STING.get(), SoundSource.PLAYERS, 0.5f, 1f);
             player.awardStat(Stats.ITEM_USED.get(this));
         }
     }

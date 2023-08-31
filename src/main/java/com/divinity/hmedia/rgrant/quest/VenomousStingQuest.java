@@ -29,7 +29,6 @@ public class VenomousStingQuest extends Quest {
     @Override
     protected List<QuestGoal> initializeGoals() {
         List<QuestGoal> goals = new ArrayList<>();
-        goals.add(new AquireAdvancementGoal("lightning_rod_with_villager_no_fire", "quest.goal.rgrant.surge_protector_advancement_goal"));
         goals.add(new GoatLoseHornGoal(3));
         goals.add(new TameEntityGoal(EntityType.CAT, 1));
         goals.add(new KillPlayersGoal(5) {

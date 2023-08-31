@@ -2,6 +2,7 @@ package com.divinity.hmedia.rgrant.event;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
+import com.divinity.hmedia.rgrant.client.AntAnimatable;
 import com.divinity.hmedia.rgrant.client.renderer.AcidEntityRenderer;
 import com.divinity.hmedia.rgrant.client.renderer.FakePlayerRenderer;
 import com.divinity.hmedia.rgrant.client.renderer.StingerEntityRenderer;
@@ -10,6 +11,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import dev._100media.hundredmediageckolib.client.animatable.IHasGeoRenderer;
+import dev._100media.hundredmediageckolib.client.animatable.MotionAttackAnimatable;
 import dev._100media.hundredmediageckolib.client.animatable.SimpleAnimatable;
 import dev._100media.hundredmediageckolib.client.model.SimpleGeoEntityModel;
 import dev._100media.hundredmediageckolib.client.model.SimpleGeoPlayerModel;
@@ -31,6 +33,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -46,7 +49,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
+import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 import java.util.Arrays;
@@ -75,8 +83,8 @@ public class ClientModEvents {
 
 
         // TODO : Change these
-        createSimpleMorphRenderer(MorphInit.BABY_ANT.get(), "baby_ant", new SimpleAnimatable(), 1.0f);
-        createSimpleMorphRenderer(MorphInit.BLACK_ANT.get(), "black_ant", new SimpleAnimatable(), 1.0f);
+        createSimpleMorphRenderer(MorphInit.BABY_ANT.get(), "baby_ant", new AntAnimatable(), 1.0f);
+        createSimpleMorphRenderer(MorphInit.BLACK_ANT.get(), "black_ant", new AntAnimatable(), 1.0f);
         createSimpleMorphRenderer(MorphInit.FIRE_ANT.get(), "baby_ant", new SimpleAnimatable(), 1.0f);
         createSimpleMorphRenderer(MorphInit.KING_ANT.get(), "baby_ant", new SimpleAnimatable(), 1.0f);
         createSimpleMorphRenderer(MorphInit.OMEGA_ANT.get(), "baby_ant", new SimpleAnimatable(), 1.0f);
@@ -150,7 +158,7 @@ public class ClientModEvents {
                         if (holder != null) {
                             poseStack.pushPose();
                             if (holder.getCamouflagedBlock() != Blocks.AIR) {
-                                poseStack.translate(1, 0, 0);
+                                poseStack.translate(-0.5, 0, -0.5);
                                 Minecraft.getInstance().getBlockRenderer().renderSingleBlock(holder.getCamouflagedBlock().defaultBlockState(), poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
                             }
                             else {
@@ -183,7 +191,7 @@ public class ClientModEvents {
                                 poseStack.scale(1, 1, 1);
                             }
                             else if (m == MorphInit.BLACK_ANT.get()) {
-                                poseStack.scale(1.15F, 1.15F, 1.15F);
+                                poseStack.scale(2F, 2F, 2F);
                             }
                             else if (m == MorphInit.FIRE_ANT.get()) {
                                 poseStack.scale(3.5F, 3.5F, 3.5F);
@@ -195,7 +203,6 @@ public class ClientModEvents {
                                 poseStack.scale(3.5F, 3.5F, 3.5F);
                             }
                         });
-                        poseStack.translate(0, 0, 0);
                         renderer.reRender(this.getEntityModel().getBakedModel(SHIELD_MODEL), poseStack, bufferSource, animatable, renderType, bufferSource.getBuffer(renderType), partialTick, packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
                         poseStack.popPose();
                     });

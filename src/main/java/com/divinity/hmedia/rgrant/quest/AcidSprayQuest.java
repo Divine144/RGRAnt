@@ -23,7 +23,7 @@ public class AcidSprayQuest extends Quest {
     @Override
     protected List<QuestGoal> initializeGoals() {
         List<QuestGoal> goals = new ArrayList<>();
-        goals.add(new AquireAdvancementGoal("lightning_rod_with_villager_no_fire", "quest.goal.rgrant.surge_protector_advancement_goal"));
+        goals.add(new AquireAdvancementGoal("lightning_rod_with_villager_no_fire", "surge_protector_advancement_goal"));
         goals.add(new KillEntityCritGoal(15, EntityType.CAVE_SPIDER) {
             @Override
             public String getDescriptionId() {

@@ -1,0 +1,47 @@
+{
+  "acid_spray": {
+    "sounds": [
+      "rgrant:acid_spray"
+    ]
+  },
+  "ant_drone_warning": {
+    "sounds": [
+      "rgrant:ant_drone_warning"
+    ]
+  },
+  "bug_spray": {
+    "sounds": [
+      "rgrant:bug_spray"
+    ]
+  },
+  "echo_location": {
+    "sounds": [
+      "rgrant:echo_location"
+    ]
+  },
+  "leaf_cutter_tools": {
+    "sounds": [
+      "rgrant:leaf_cutter_tools"
+    ]
+  },
+  "mandibles": {
+    "sounds": [
+      "rgrant:mandibles"
+    ]
+  },
+  "mind_control": {
+    "sounds": [
+      "rgrant:mind_control"
+    ]
+  },
+  "swarm_shield": {
+    "sounds": [
+      "rgrant:swarm_shield"
+    ]
+  },
+  "venomous_sting": {
+    "sounds": [
+      "rgrant:venomous_sting"
+    ]
+  }
+}

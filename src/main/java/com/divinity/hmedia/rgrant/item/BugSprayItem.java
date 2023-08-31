@@ -1,6 +1,7 @@
 package com.divinity.hmedia.rgrant.item;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev._100media.hundredmediageckolib.item.animated.AnimatedItemProperties;
@@ -12,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -50,15 +52,14 @@ public class BugSprayItem extends SimpleAnimatedItem {
 
     @Override
     public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity entity, InteractionHand hand) {
-        if (entity.level().isClientSide) return InteractionResult.SUCCESS;
-
-
-        triggerAnim(playerIn, GeoItem.getOrAssignId(stack, (ServerLevel) playerIn.level()), "controller", "spray");
-
-        // TODO: Add sound here
+        if (entity.level().isClientSide) return InteractionResult.CONSUME;
+        if (entity instanceof ServerPlayer player && MorphHolderAttacher.getCurrentMorph(player).isPresent()) {
+            triggerAnim(playerIn, GeoItem.getOrAssignId(stack, (ServerLevel) playerIn.level()), "controller", "spray");
+            player.level().playSound(null, player.blockPosition(), SoundInit.BUG_SPRAY.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0, false, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0, false, false, false));
+        }
         return InteractionResult.CONSUME;
-
-
     }
 
 
@@ -90,8 +91,8 @@ public class BugSprayItem extends SimpleAnimatedItem {
                         protected void renderInGui(ItemDisplayContext transformType, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
                             poseStack.pushPose();
                             poseStack.mulPose(Axis.YP.rotationDegrees(90));
-                            poseStack.scale(1.2f, 1.2f, 1.2f);
-                            poseStack.translate(0.05, -0.25, -0.1);
+                            poseStack.scale(1.0f, 1.0f, 1.0f);
+                            poseStack.translate(0.05, -0.6, 0);
                             super.renderInGui(transformType, poseStack, bufferSource, packedLight, packedOverlay);
                             poseStack.popPose();
                         }
@@ -107,11 +108,7 @@ public class BugSprayItem extends SimpleAnimatedItem {
             var data = event.getData(DataTickets.ITEMSTACK);
             var entity = event.getData(DataTickets.ENTITY);
             if (data != null && data.getItem() == this && entity instanceof Player player) {
-                if (!isFirstUse && player.getItemInHand(InteractionHand.MAIN_HAND).is(this)) {
-                    isFirstUse = true;
-                    event.setAnimation(shake);
-                    return PlayState.CONTINUE;
-                }
+
             }
             return PlayState.CONTINUE;
         }).triggerableAnim("spray", spray));

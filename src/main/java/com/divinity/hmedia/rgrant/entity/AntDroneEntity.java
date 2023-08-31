@@ -1,6 +1,7 @@
 package com.divinity.hmedia.rgrant.entity;
 
 import com.divinity.hmedia.rgrant.init.ItemInit;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import net.minecraft.ChatFormatting;
@@ -9,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -49,10 +51,10 @@ public class AntDroneEntity extends PathfinderMob implements GeoEntity {
                     if (isAttack()) {
                         player.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0));
                         player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
-                        // TODO: Add spraying sound here
+                        player.level().playSound(null, player.blockPosition(), SoundInit.BUG_SPRAY.get(), SoundSource.PLAYERS, 0.5f, 1f);
                     }
                     else {
-                        // TODO: alarm sound here
+                        player.level().playSound(null, player.blockPosition(), SoundInit.ANT_DRONE_WARNING.get(), SoundSource.PLAYERS, 0.5f, 1f);
                     }
                 }
             }

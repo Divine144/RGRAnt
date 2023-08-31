@@ -1,15 +1,23 @@
 package com.divinity.hmedia.rgrant.item;
 
+import com.divinity.hmedia.rgrant.RGRAnt;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import dev._100media.hundredmediageckolib.item.animated.AnimatedItemProperties;
 import dev._100media.hundredmediageckolib.item.animated.SimpleAnimatedItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -36,22 +44,125 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.IForgeShearable;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.constant.DataTickets;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.Animation;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.model.DefaultedItemGeoModel;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import static net.minecraft.world.item.BowItem.getPowerForTime;
 
 public class LeafCutterToolsItem extends SimpleAnimatedItem {
 
     private ToolTypes toolType;
+    // pick -> shovel -> axe -> bow -> flint -> pearl -> shears
+
+    private static final RawAnimation PICK_IDLE = RawAnimation.begin().thenLoop("pickaxe-IDLE");
+    private static final RawAnimation SHOVEL_IDLE = RawAnimation.begin().thenLoop("shovel-IDLE");
+    private static final RawAnimation AXE_IDLE = RawAnimation.begin().thenLoop("axe_IDLE");
+    private static final RawAnimation BOW_IDLE = RawAnimation.begin().thenLoop("bow-IDLE");
+
+    private static final RawAnimation BOW_LOAD = RawAnimation.begin()
+            .then("bow-LOAD", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("bow-LOADED");
+
+    private static final RawAnimation BOW_SHOOT = RawAnimation.begin()
+            .then("bow-SHOOT", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("bow-IDLE");
+
+    private static final RawAnimation FLINT_IDLE = RawAnimation.begin().thenLoop("flintsteel-ON");
+    private static final RawAnimation PEARL_IDLE = RawAnimation.begin().thenLoop("bucket_IDLE-EMPTY");
+    private static final RawAnimation SHEARS_IDLE = RawAnimation.begin().thenLoop("shears-IDLE");
+
+    private static final RawAnimation PICK_TO_SHOVEL = RawAnimation.begin()
+            .then("pickaxe-CLOSE", Animation.LoopType.PLAY_ONCE)
+            .then("shovel-RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("shovel-IDLE");
+
+    private static final RawAnimation SHOVEL_TO_AXE = RawAnimation.begin()
+            .then("shovel-CLOSE", Animation.LoopType.PLAY_ONCE)
+            .then("axe_RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("axe_IDLE");
+
+    private static final RawAnimation AXE_TO_BOW = RawAnimation.begin()
+            .then("axe_CLOSE", Animation.LoopType.PLAY_ONCE)
+            .then("bow-RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("bow-IDLE");
+
+    private static final RawAnimation BOW_TO_FLINT = RawAnimation.begin()
+            .then("bow-CLOSE", Animation.LoopType.PLAY_ONCE)
+            .then("flintsteel-RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("flintsteel-ON");
+
+    // TODO: Change to pearl
+    private static final RawAnimation FLINT_TO_PEARL = RawAnimation.begin()
+            .then("flintsteel-TURNOFF", Animation.LoopType.PLAY_ONCE)
+            .then("bucket_RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("bucket_IDLE-EMPTY");
+
+    private static final RawAnimation PEARL_TO_SHEARS = RawAnimation.begin()
+            .then("bucket_CLOSE", Animation.LoopType.PLAY_ONCE)
+            .then("shears-RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("shears-IDLE");
+
+    private static final RawAnimation SHEARS_TO_PICK = RawAnimation.begin()
+            .then("shears-CLOSE", Animation.LoopType.PLAY_ONCE)
+            .then("pickaxe-RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("pickaxe-IDLE");
+
+
     public LeafCutterToolsItem(AnimatedItemProperties properties) {
         super(properties);
         this.toolType = ToolTypes.PICK;
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+        controllerRegistrar.add(new AnimationController<>(this, "controller", 0, event -> {
+            var data = event.getData(DataTickets.ITEMSTACK);
+            if (data != null && data.getItem() == this) {
+                CompoundTag tag = data.getShareTag();
+                if (tag != null) {
+                    int cycle = tag.getInt("cycle");
+                    return switch (ToolTypes.values()[cycle]) {
+                        case PICK -> event.setAndContinue(PICK_IDLE);
+                        case SHOVEL -> event.setAndContinue(SHOVEL_IDLE);
+                        case AXE -> event.setAndContinue(AXE_IDLE);
+                        case BOW -> event.setAndContinue(BOW_IDLE);
+                        case FLINT -> event.setAndContinue(FLINT_IDLE);
+                        case PEARL -> event.setAndContinue(PEARL_IDLE);
+                        case SHEARS -> event.setAndContinue(SHEARS_IDLE);
+                    };
+                }
+                else return event.setAndContinue(PICK_IDLE);
+            }
+            return PlayState.CONTINUE;
+        }).triggerableAnim("pickToShovel", PICK_TO_SHOVEL)
+          .triggerableAnim("shovelToAxe", SHOVEL_TO_AXE)
+          .triggerableAnim("axeToBow", AXE_TO_BOW)
+          .triggerableAnim("bowToFlint", BOW_TO_FLINT)
+          .triggerableAnim("flintToPearl", FLINT_TO_PEARL)
+          .triggerableAnim("pearlToShears", PEARL_TO_SHEARS)
+          .triggerableAnim("shearsToPick", SHEARS_TO_PICK)
+          .triggerableAnim("bowLoading", BOW_LOAD)
+          .triggerableAnim("bowShoot", BOW_SHOOT)
+        );
     }
 
     @Override
@@ -59,6 +170,58 @@ public class LeafCutterToolsItem extends SimpleAnimatedItem {
         CompoundTag tag = stack.getOrCreateTag();
         int ordinal = tag.getInt("cycle");
         return slot == EquipmentSlot.MAINHAND ? ToolTypes.values()[ordinal].modifierMultimap : ImmutableMultimap.of();
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private BlockEntityWithoutLevelRenderer renderer;
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null)
+                    this.renderer = new GeoItemRenderer<LeafCutterToolsItem>(new DefaultedItemGeoModel<>(new ResourceLocation(RGRAnt.MODID, "leaf_cutter_tools"))) {
+
+                        @Override
+                        public void renderByItem(ItemStack stack, ItemDisplayContext transformType, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+                            poseStack.pushPose();
+                            switch (transformType) {
+                                case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {}
+                                case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> {
+                                    poseStack.mulPose(Axis.YP.rotationDegrees(90));
+                                    poseStack.scale(0.75f, 0.75f, 0.75f);
+                                    poseStack.translate(0, -0.8, 0.75);
+                                }
+                            }
+                            super.renderByItem(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay);
+                            poseStack.popPose();
+                        }
+
+                        @Override
+                        protected void renderInGui(ItemDisplayContext transformType, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+                            poseStack.pushPose();
+                            if (currentItemStack != null && animatable != null) {
+                                CompoundTag tag = animatable.getShareTag(currentItemStack);
+                                if (tag != null) {
+                                    int cycle = tag.getInt("cycle");
+                                    ToolTypes type = ToolTypes.values()[cycle];
+                                    if (type == ToolTypes.BOW) {
+                                        poseStack.scale(0.2f, 0.2f, 0.2f);
+                                        poseStack.mulPose(Axis.ZN.rotationDegrees(-45));
+                                        poseStack.translate(3.5, -1.25, 0);
+                                    }
+                                    else {
+                                        poseStack.scale(0.3f, 0.3f, 0.3f);
+                                        poseStack.translate(1.2, -0.2, 0);
+                                    }
+                                }
+                            }
+                            super.renderInGui(transformType, poseStack, bufferSource, packedLight, packedOverlay);
+                            poseStack.popPose();
+                        }
+                    };
+                return this.renderer;
+            }
+        });
     }
 
     @Override
@@ -81,6 +244,9 @@ public class LeafCutterToolsItem extends SimpleAnimatedItem {
                         }
                         abstractarrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                         pLevel.addFreshEntity(abstractarrow);
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            triggerAnim(serverPlayer, GeoItem.getOrAssignId(pStack, serverPlayer.serverLevel()), "controller", "bowShoot");
+                        }
                     }
                     pLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (pLevel.getRandom().nextFloat() * 0.4F + 1.2F) + f * 0.5F);
                     player.awardStat(Stats.ITEM_USED.get(this));
@@ -97,10 +263,21 @@ public class LeafCutterToolsItem extends SimpleAnimatedItem {
         }
         CompoundTag tag = itemStack.getOrCreateTag();
         if (pPlayer.isShiftKeyDown()) {
-            // TODO: Add sound effect
+            // pick -> shovel -> axe -> bow -> flint -> pearl -> shears
+            String animName = switch (ToolTypes.values()[tag.getInt("cycle")]) {
+                case PICK -> "pickToShovel";
+                case SHOVEL -> "shovelToAxe";
+                case AXE -> "axeToBow";
+                case BOW -> "bowToFlint";
+                case FLINT -> "flintToPearl";
+                case PEARL -> "pearlToShears";
+                case SHEARS -> "shearsToPick";
+            };
+            triggerAnim(pPlayer, GeoItem.getOrAssignId(itemStack, (ServerLevel) pLevel), "controller", animName);
             this.toolType = toolType.next();
-            pPlayer.displayClientMessage(Component.literal("Tool changed to: " + toolType.name()).withStyle(ChatFormatting.GREEN), true);
             tag.putInt("cycle", toolType.ordinal());
+            pPlayer.level().playSound(null, pPlayer.blockPosition(), SoundInit.LEAF_TOOLS.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            pPlayer.displayClientMessage(Component.literal("Tool changed to: " + toolType.name()).withStyle(ChatFormatting.GREEN), true);
         }
         else {
             if (ToolTypes.values()[tag.getInt("cycle")] == ToolTypes.PEARL) {
@@ -114,6 +291,7 @@ public class LeafCutterToolsItem extends SimpleAnimatedItem {
                 return InteractionResultHolder.sidedSuccess(itemStack, pLevel.isClientSide());
             }
             else if (ToolTypes.values()[tag.getInt("cycle")] == ToolTypes.BOW) {
+                triggerAnim(pPlayer, GeoItem.getOrAssignId(itemStack, (ServerLevel) pLevel), "controller", "bowLoading");
                 return ItemUtils.startUsingInstantly(pLevel, pPlayer, pUsedHand);
             }
         }

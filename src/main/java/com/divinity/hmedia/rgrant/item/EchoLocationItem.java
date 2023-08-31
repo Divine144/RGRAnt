@@ -1,12 +1,13 @@
 package com.divinity.hmedia.rgrant.item;
 
-import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EchoLocationItem extends Item {
+
     public EchoLocationItem(Properties pProperties) {
         super(pProperties);
     }
@@ -42,7 +44,6 @@ public class EchoLocationItem extends Item {
         return false;
     }
 
-    // TODO: Add sound
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
@@ -79,6 +80,7 @@ public class EchoLocationItem extends Item {
                     .append(Component.literal(" found: " + found.getX() + " " + found.getY() + " " + found.getZ())
                     .withStyle(ChatFormatting.WHITE)), false);
         }
+        pPlayer.level().playSound(null, pPlayer.blockPosition(), SoundInit.ECHO_LOCATION.get(), SoundSource.PLAYERS, 0.5f, 1f);
         return InteractionResultHolder.consume(itemStack);
     }
 

@@ -1,10 +1,12 @@
 package com.divinity.hmedia.rgrant.item;
 
 import com.divinity.hmedia.rgrant.init.EntityInit;
+import com.divinity.hmedia.rgrant.init.SoundInit;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
 import dev._100media.hundredmediageckolib.item.animated.AnimatedItemProperties;
 import dev._100media.hundredmediageckolib.item.animated.SimpleAnimatedItem;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -36,6 +38,7 @@ public class AcidSprayItem extends Item {
         if (!pLevel.isClientSide) {
             if (pLivingEntity instanceof ServerPlayer player) {
                 if (pRemainingUseDuration % 2 == 0) {
+
                     var entity = EntityInit.ACID_ENTITY.get().create(pLevel);
                     if (entity != null) {
                         entity.setPos(player.getX(), player.getEyeY() - 0.15, player.getZ());
@@ -47,6 +50,7 @@ public class AcidSprayItem extends Item {
                         entity.xRotO = -Mth.wrapDegrees(player.xRotO);
                         entity.yRotO = -Mth.wrapDegrees(player.yRotO);
                         player.level().addFreshEntity(entity);
+                        player.level().playSound(null, player.blockPosition(), SoundInit.ACID_SPRAY.get(), SoundSource.PLAYERS, 0.5f, 1f);
                     }
                 }
             }
