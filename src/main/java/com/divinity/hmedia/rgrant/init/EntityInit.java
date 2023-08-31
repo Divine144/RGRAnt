@@ -1,10 +1,7 @@
 package com.divinity.hmedia.rgrant.init;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
-import com.divinity.hmedia.rgrant.entity.AcidProjectileEntity;
-import com.divinity.hmedia.rgrant.entity.AntEntity;
-import com.divinity.hmedia.rgrant.entity.MindControlledPlayerEntity;
-import com.divinity.hmedia.rgrant.entity.StingerProjectileEntity;
+import com.divinity.hmedia.rgrant.entity.*;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -28,6 +25,9 @@ public class EntityInit {
 
     public static final RegistryObject<EntityType<MindControlledPlayerEntity>> MIND_CONTROLLED_PLAYER = registerEntity("mind_controlled_player", () ->
             EntityType.Builder.of(MindControlledPlayerEntity::new, MobCategory.MISC).sized(0.6f, 1.5f), MindControlledPlayerEntity::createAttributes);
+
+    public static final RegistryObject<EntityType<AntDroneEntity>> ANT_DRONE_ENTITY = registerEntity("ant_drone_entity", () ->
+            EntityType.Builder.of(AntDroneEntity::new, MobCategory.MISC).sized(1f, 1f), AntDroneEntity::createAttributes);
 
     public static final RegistryObject<EntityType<AcidProjectileEntity>> ACID_ENTITY = registerEntity("acid_entity", () ->
             EntityType.Builder.of(AcidProjectileEntity::new, MobCategory.MISC)

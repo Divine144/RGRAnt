@@ -20,12 +20,17 @@ public class ItemInit {
 
     public static final RegistryObject<Item> BUG_NET = ITEMS.register("bug_net", () -> new BugNetItem(new AnimatedItemProperties().stacksTo(1)));
 
+    public static final RegistryObject<Item> ANT_DRONE = ITEMS.register("ant_drone", () -> new AntDroneItem(new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<Item> LEAF_CUTTER_TOOLS = ITEMS.register("leaf_cutter_tools", () -> new LeafCutterToolsItem(new AnimatedItemProperties().stacksTo(1)));
     public static final RegistryObject<Item> VENOMOUS_STING = ITEMS.register("venomous_sting", () -> new VenomousStingItem(new AnimatedItemProperties().stacksTo(1)));
 
     public static final RegistryObject<Item> ECHO_LOCATION = ITEMS.register("echo_location", () -> new EchoLocationItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> MIND_CONTROL = ITEMS.register("mind_control", () -> new MindControlItem(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> MIND_CONTROL_ARMOR = ITEMS.register("mind_control_armor", () -> new MindControlArmorItem(new AnimatedItemProperties().stacksTo(1)));
+
 
 
     public static Item.Properties getItemProperties() {

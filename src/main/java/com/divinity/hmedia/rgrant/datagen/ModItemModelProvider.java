@@ -25,7 +25,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         //         .map(Supplier::get)
         //         .forEach(this::simpleHandHeldModel);
 
-        Stream.of(ItemInit.ACID_SPRAY)
+        Stream.of(ItemInit.ACID_SPRAY, ItemInit.ANT_DRONE, ItemInit.ECHO_LOCATION, ItemInit.MANDIBLES, ItemInit.MIND_CONTROL_ARMOR)
                 .map(Supplier::get)
                 .forEach(this::simpleGeneratedModel);
 

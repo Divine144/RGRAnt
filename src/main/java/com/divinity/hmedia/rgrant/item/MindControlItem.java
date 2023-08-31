@@ -2,6 +2,7 @@ package com.divinity.hmedia.rgrant.item;
 
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import com.divinity.hmedia.rgrant.init.EntityInit;
+import com.divinity.hmedia.rgrant.init.ItemInit;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -35,7 +36,7 @@ public class MindControlItem extends Item {
                     for (EquipmentSlot slot : EquipmentSlot.values()) {
                         fakePlayer.setItemSlot(slot, serverPlayer.getItemBySlot(slot));
                     }
-                    //            this.setItemSlot(EquipmentSlot.HEAD, ); TODO: Set head to mind control armor
+                    fakePlayer.setItemSlot(EquipmentSlot.HEAD, ItemInit.MIND_CONTROL_ARMOR.get().getDefaultInstance());
                     serverPlayer.serverLevel().addFreshEntity(fakePlayer);
                     // TODO: Add sound
                 }

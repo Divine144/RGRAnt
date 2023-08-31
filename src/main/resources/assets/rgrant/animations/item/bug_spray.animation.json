@@ -1,0 +1,138 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"shake": {
+			"animation_length": 1,
+			"bones": {
+				"spray1": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"spray2": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"All": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.125": {
+							"vector": [0, 0, -25],
+							"easing": "easeInOutQuad"
+						},
+						"0.25": {
+							"vector": [0, 0, 10],
+							"easing": "easeInOutQuad"
+						},
+						"0.375": {
+							"vector": [0, 0, -25],
+							"easing": "easeInOutQuad"
+						},
+						"0.5": {
+							"vector": [0, 0, 10],
+							"easing": "easeInOutQuad"
+						},
+						"0.625": {
+							"vector": [0, 0, -25],
+							"easing": "easeInOutQuad"
+						},
+						"0.75": {
+							"vector": [0, 0, 10],
+							"easing": "easeInOutQuad"
+						},
+						"0.875": {
+							"vector": [0, 0, -25],
+							"easing": "easeInOutQuad"
+						},
+						"1.0": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutQuad"
+						}
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		},
+		"spray": {
+			"loop": true,
+			"animation_length": 0.29167,
+			"bones": {
+				"spray1": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.1667": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutQuad"
+						},
+						"0.2917": {
+							"vector": [0, 0, 37.5],
+							"easing": "easeInOutQuad"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, -0.5, 7]
+						},
+						"0.1667": {
+							"vector": [0, 0, 7],
+							"easing": "easeInOutQuad"
+						},
+						"0.2917": {
+							"vector": [0, 0, 2],
+							"easing": "easeInOutQuad"
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.1667": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutQuad"
+						},
+						"0.2917": {
+							"vector": [1, 1, 1],
+							"easing": "easeInOutQuad"
+						}
+					}
+				},
+				"spray2": {
+					"position": {
+						"0.0": {
+							"vector": [0, -0.5, 6.5]
+						},
+						"0.125": {
+							"vector": [0, 0, 1],
+							"easing": "easeInOutQuad"
+						},
+						"0.1667": {
+							"vector": [0, -0.5, 6.5],
+							"easing": "easeInOutQuad"
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.125": {
+							"vector": [1, 1, 1],
+							"easing": "easeInOutQuad"
+						},
+						"0.1667": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutQuad"
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}
