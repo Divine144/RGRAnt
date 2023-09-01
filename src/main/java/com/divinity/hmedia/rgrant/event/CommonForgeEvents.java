@@ -117,18 +117,6 @@ public class CommonForgeEvents {
                 }
             }
         }
-/*        if (event.getEntity() instanceof MindControlledPlayerEntity mindControlledPlayerEntity) {
-            if (!mindControlledPlayerEntity.level().isClientSide) {
-                Player player = mindControlledPlayerEntity.getOwner();
-                if (player instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.setGameMode(GameType.SURVIVAL);
-                    serverPlayer.copyPosition(mindControlledPlayerEntity);
-                    mindControlledPlayerEntity.discard();
-                    AntHolderAttacher.getAntHolder(serverPlayer).ifPresent(h -> h.setMindControlTicks(0));
-                    serverPlayer.kill();
-                }
-            }
-        }*/
     }
 
     @SubscribeEvent

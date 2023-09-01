@@ -16,6 +16,7 @@ public class AntSizeDownAbility extends Ability {
         if (holder != null) {
             AntHolder.Size size = holder.getCurrentSize();
             if (size == size.previous()) {
+                //
                 player.displayClientMessage(Component.literal("Cannot Decrease Size Further").withStyle(ChatFormatting.RED), true);
             }
             else {

@@ -19,6 +19,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import software.bernie.geckolib.GeckoLib;
 
 @Mod(RGRAnt.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -47,6 +48,7 @@ public class RGRAnt {
         SkillInit.SKILL_TREES.register(modBus);
         EffectInit.EFFECTS.register(modBus);
         AntHolderAttacher.register();
+        GeckoLib.initialize();
     }
 
     @SubscribeEvent

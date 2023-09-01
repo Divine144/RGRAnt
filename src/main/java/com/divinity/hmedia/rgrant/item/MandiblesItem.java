@@ -80,7 +80,6 @@ public class MandiblesItem extends AnimatedSwordItem {
             playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
             entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
             playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
-
         }
         return InteractionResult.CONSUME;
     }
