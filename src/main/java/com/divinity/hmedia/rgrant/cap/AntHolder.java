@@ -51,6 +51,7 @@ public class AntHolder extends EntityCapability {
         tag.putInt("toSwing", toSwing);
         tag.putDouble("remainingShield", this.remainingShield);
         tag.putInt("gigaAntTicks", this.gigaAntTicks);
+        //
         if (captured != null) {
             tag.putUUID("captured", captured);
         }

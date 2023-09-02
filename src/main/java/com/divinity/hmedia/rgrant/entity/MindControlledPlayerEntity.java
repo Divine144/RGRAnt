@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class MindControlledPlayerEntity extends PathfinderMob {
+
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(MindControlledPlayerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     public MindControlledPlayerEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
@@ -147,8 +148,8 @@ public class MindControlledPlayerEntity extends PathfinderMob {
             Player player = this.getOwner();
             if (player instanceof ServerPlayer serverPlayer) {
                 this.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, -1, 0, false, false, false));
-                serverPlayer.setGameMode(GameType.SURVIVAL);
                 serverPlayer.copyPosition(this);
+                serverPlayer.setGameMode(GameType.SURVIVAL);
                 AntHolderAttacher.getAntHolder(serverPlayer).ifPresent(h -> h.setMindControlTicks(0));
                 serverPlayer.kill();
             }
