@@ -11,6 +11,7 @@ import dev._100media.hundredmediaquests.quest.QuestType;
 import dev._100media.hundredmediaquests.reward.ItemQuestReward;
 import dev._100media.hundredmediaquests.reward.QuestReward;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +40,7 @@ public class MandiblesQuest extends Quest {
 
             @Override
             public boolean tallyKill(Entity entity, DamageSource source) {
-                return source.getEntity() instanceof ServerPlayer player && AntUtils.hasItemEitherHands(player, Items.DIAMOND_PICKAXE) && super.tallyKill(entity, source);
+                return source.getEntity() instanceof ServerPlayer player && AntUtils.hasItemEitherHands(player, ItemTags.PICKAXES) && super.tallyKill(entity, source);
             }
 
             @Override

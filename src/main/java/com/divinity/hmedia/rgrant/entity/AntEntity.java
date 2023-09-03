@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.entity;
 
+import com.divinity.hmedia.rgrant.entity.goal.OwnerHurtTargetGoal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -19,8 +20,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
@@ -30,6 +35,10 @@ import java.util.UUID;
 public class AntEntity extends PathfinderMob implements GeoEntity {
 
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+    private static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("attack");
+    private static final RawAnimation RUN = RawAnimation.begin().thenLoop("run");
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(AntEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     public AntEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
@@ -97,6 +106,7 @@ public class AntEntity extends PathfinderMob implements GeoEntity {
                 return super.canContinueToUse() && target != AntEntity.this.getOwner();
             }
         });
+        this.targetSelector.addGoal(1, new OwnerHurtTargetGoal(this));
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7F, true));
         this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, LivingEntity.class, 10F));
@@ -129,7 +139,23 @@ public class AntEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-
+        controllerRegistrar.add(new AnimationController<>(this, "controller", 0, state -> {
+            AnimationController<?> controller = state.getController();
+            if (state.getData(DataTickets.ENTITY) instanceof AntDroneEntity entity) {
+                controller.transitionLength(0);
+                if (entity.swingTime > 0) {
+                    controller.setAnimation(ATTACK);
+                    return PlayState.CONTINUE;
+                }
+                else if (state.isMoving()) {
+                    controller.setAnimation(RUN);
+                }
+                else {
+                    controller.setAnimation(IDLE);
+                }
+            }
+            return PlayState.CONTINUE;
+        }));
     }
 
     @Override

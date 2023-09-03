@@ -18,6 +18,7 @@ import dev._100media.hundredmediaabilities.capability.AbilityHolderAttacher;
 import dev._100media.hundredmediaabilities.capability.MarkerHolderAttacher;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
+import dev._100media.hundredmediaquests.goal.KillPlayersGoal;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -114,6 +115,14 @@ public class CommonForgeEvents {
             if (!antEntity.level().isClientSide) {
                 if (event.getEntity() instanceof EnderMan && antEntity.getOwner() instanceof ServerPlayer player) {
                     AntUtils.addToGenericQuestGoal(player, AntArmyKillEndermanGoal.class);
+                }
+                else if (event.getEntity() instanceof Player diedPlayer && antEntity.getOwner() instanceof ServerPlayer player) {
+                    QuestHolderAttacher.checkAllGoals(player, questGoal -> {
+                        if (questGoal instanceof KillPlayersGoal goal) {
+                            return goal.tallyKill(diedPlayer, event.getSource());
+                        }
+                        return false;
+                    });
                 }
             }
         }

@@ -43,10 +43,11 @@ public class ModLangProvider extends LanguageProvider {
         add("key.category.rgrant", "RGRAnt");
 
         add("itemGroup.hundredMediaTab", "100 Media");
+        add("effect.rgrant.netted", "Netted");
         // Quest Descriptions
         add("quest.goal.rgrant.ant_army_kill_enderman_goal.description", "Have \"Ant Army\" Ants kill 5 Endermen");
         add("quest.goal.rgrant.surge_protector_advancement_goal.description", "Earn the Advancement \"Surge Protector\"");
-        add("quest.goal.rgrant.make_camel_jump_goal.description", "Make a Camel Jump 10 Times");
+        add("quest.goal.rgrant.make_camel_jump_goal.description", "Make a Camel Dash 10 Times");
         add("quest.goal.rgrant.give_allay_item_goal.description", "Give an Allay Any Item");
         add("quest.goal.rgrant.goat_lose_horn_goal.description", "Make Goats Lose Their Horns 3 Times");
         add("quest.goal.rgrant.hit_villagers_quest_goal.description", "Hit Villagers 10 Times");

@@ -804,6 +804,40 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "enderpearl2",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "enderpearl",
+					"parent": "enderpearl2",
+					"pivot": [81, 39, 0],
+					"cubes": [
+						{
+							"origin": [75, 33, -0.1],
+							"size": [12, 12, 0.2],
+							"uv": {
+								"north": {"uv": [10.625, 6.70833], "uv_size": [1.375, 1.33333]},
+								"south": {"uv": [10.625, 6.70833], "uv_size": [1.375, 1.33333]}
+							}
+						}
+					]
+				},
+				{
+					"name": "enderpearlspark",
+					"parent": "enderpearl2",
+					"pivot": [68.5, 39, 0],
+					"cubes": [
+						{
+							"origin": [62, 33, -0.1],
+							"size": [12, 12, 0.2],
+							"uv": {
+								"north": {"uv": [11.875, 5.33333], "uv_size": [1.375, 1.33333]},
+								"south": {"uv": [11.875, 5.33333], "uv_size": [1.375, 1.33333]}
+							}
+						}
+					]
 				}
 			]
 		}

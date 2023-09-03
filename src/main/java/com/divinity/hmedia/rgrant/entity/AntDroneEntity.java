@@ -27,13 +27,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.constant.DataTickets;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class AntDroneEntity extends PathfinderMob implements GeoEntity {
 
     private static final EntityDataAccessor<Boolean> IS_ATTACK = SynchedEntityData.defineId(AntDroneEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("attack");
+    private static final RawAnimation CROUCH = RawAnimation.begin().thenLoop("crouch");
+    private static final RawAnimation RUN = RawAnimation.begin().thenLoop("run");
+    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     public AntDroneEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
@@ -59,6 +69,12 @@ public class AntDroneEntity extends PathfinderMob implements GeoEntity {
                 }
             }
         }
+    }
+
+    @Override
+    public void aiStep() {
+        this.updateSwingTime(); // Makes attack animations sync properly on client
+        super.aiStep();
     }
 
     @Override
@@ -92,6 +108,7 @@ public class AntDroneEntity extends PathfinderMob implements GeoEntity {
                 boolean isAttack = !entityData.get(IS_ATTACK);
                 pPlayer.displayClientMessage(Component.literal("%s mode activated.".formatted(isAttack ? "Attack" : "Defense"))
                         .withStyle(ChatFormatting.RED), true);
+                entityData.set(IS_ATTACK, isAttack);
             }
             else {
                 pPlayer.getInventory().add(ItemInit.ANT_DRONE.get().getDefaultInstance());
@@ -104,7 +121,23 @@ public class AntDroneEntity extends PathfinderMob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-
+        controllerRegistrar.add(new AnimationController<>(this, "controller", 0, state -> {
+            AnimationController<?> controller = state.getController();
+            if (state.getData(DataTickets.ENTITY) instanceof AntDroneEntity entity) {
+                controller.transitionLength(0);
+                if (entity.swingTime > 0) {
+                    controller.setAnimation(ATTACK);
+                    return PlayState.CONTINUE;
+                }
+                else if (state.isMoving()) {
+                    controller.setAnimation(entity.isSprinting() && !entity.isCrouching() ? RUN : WALK);
+                }
+                else {
+                    controller.setAnimation(IDLE);
+                }
+            }
+            return PlayState.CONTINUE;
+        }));
     }
 
     @Override

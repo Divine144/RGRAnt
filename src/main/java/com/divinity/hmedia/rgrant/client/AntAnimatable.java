@@ -10,23 +10,13 @@ import software.bernie.geckolib.core.object.PlayState;
 
 public class AntAnimatable extends MotionAttackAnimatable {
 
-    private String attackName = "";
-    private String vehicleSitName = "";
-    private String crouchName = "";
-    private String walkName = "";
-    private String runName = "";
-    private String idleName = "";
+    private static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("attack");
+    private static final RawAnimation CROUCH = RawAnimation.begin().thenLoop("crouch");
+    private static final RawAnimation RUN = RawAnimation.begin().thenLoop("run");
+    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
 
     public AntAnimatable() {}
-
-    public AntAnimatable(String attackName, String vehicleSitName, String crouchName, String walkName, String runName, String idleName) {
-        this.attackName = attackName;
-        this.vehicleSitName = vehicleSitName;
-        this.crouchName = crouchName;
-        this.walkName = walkName;
-        this.runName = runName;
-        this.idleName = idleName;
-    }
 
     @Override
     protected PlayState attackAnimationEvent(AnimationState<? extends MotionAttackAnimatable> state) {
@@ -34,7 +24,7 @@ public class AntAnimatable extends MotionAttackAnimatable {
         if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {
             controller.transitionLength(0);
             if (player.swingTime > 0) {
-                controller.setAnimation(RawAnimation.begin().thenLoop(this.getAnimationName(attackName, "attack")));
+                controller.setAnimation(ATTACK);
                 return PlayState.CONTINUE;
             }
             motionAnimationEvent(state);
@@ -47,27 +37,16 @@ public class AntAnimatable extends MotionAttackAnimatable {
         AnimationController<?> controller = state.getController();
         if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {
             controller.transitionLength(0);
-            if (player.getVehicle() != null) {
-                controller.setAnimation(RawAnimation.begin().thenLoop(this.getAnimationName(vehicleSitName, "Pose")));
-            }
-            else if (player.isShiftKeyDown()) {
-                controller.setAnimation(RawAnimation.begin().thenLoop(this.getAnimationName(crouchName, "crouch")));
+            if (player.isShiftKeyDown()) {
+                controller.setAnimation(CROUCH);
             }
             else if (state.isMoving()) {
-                controller.setAnimation(RawAnimation.begin().thenLoop(
-                        player.isSprinting() && !player.isCrouching()
-                        ? getAnimationName(runName, "run")
-                        : getAnimationName(walkName, "walk")
-                ));
+                controller.setAnimation(player.isSprinting() && !player.isCrouching() ? RUN : WALK);
             }
             else {
-                controller.setAnimation(RawAnimation.begin().thenLoop(this.getAnimationName(idleName, "idle")));
+                controller.setAnimation(IDLE);
             }
         }
         return PlayState.CONTINUE;
-    }
-
-    private String getAnimationName(String animationName, String defaultName) {
-        return animationName.isEmpty() ? defaultName : animationName;
     }
 }

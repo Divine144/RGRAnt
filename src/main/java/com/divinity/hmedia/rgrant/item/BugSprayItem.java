@@ -9,6 +9,7 @@ import dev._100media.hundredmediageckolib.item.animated.SimpleAnimatedItem;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -53,12 +55,11 @@ public class BugSprayItem extends SimpleAnimatedItem {
     @Override
     public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity entity, InteractionHand hand) {
         if (entity.level().isClientSide) return InteractionResult.CONSUME;
-        if (entity instanceof ServerPlayer player && MorphHolderAttacher.getCurrentMorph(player).isPresent()) {
-            triggerAnim(playerIn, GeoItem.getOrAssignId(stack, (ServerLevel) playerIn.level()), "controller", "spray");
-            player.level().playSound(null, player.blockPosition(), SoundInit.BUG_SPRAY.get(), SoundSource.PLAYERS, 0.5f, 1f);
-            player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0, false, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0, false, false, false));
-        }
+        triggerAnim(playerIn, GeoItem.getOrAssignId(stack, (ServerLevel) playerIn.level()), "controller", "spray");
+        entity.level().playSound(null, entity.blockPosition(), SoundInit.BUG_SPRAY.get(), SoundSource.PLAYERS, 0.5f, 1f);
+        entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0, false, false, false));
+        entity.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0, false, false, false));
+        ((ServerLevel) playerIn.level()).sendParticles(ParticleTypes.LARGE_SMOKE, entity.getX(), entity.getEyeY(), entity.getZ(), 10, 0, 0, 0, 0.1f);
         return InteractionResult.CONSUME;
     }
 
@@ -77,10 +78,10 @@ public class BugSprayItem extends SimpleAnimatedItem {
                             poseStack.pushPose();
                             switch (transformType) {
                                 case THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {
-                                    poseStack.translate(-0.07, -0.2, -0.3);
+                                    poseStack.translate(0, -0.4, 0);
                                 }
                                 case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND -> {
-
+                                    poseStack.translate(0, -0.25, 0);
                                 }
                             }
                             super.renderByItem(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay);

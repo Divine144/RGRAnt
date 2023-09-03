@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.cap;
 
+import com.divinity.hmedia.rgrant.init.MorphInit;
 import com.divinity.hmedia.rgrant.item.EchoLocationItem;
 import com.divinity.hmedia.rgrant.network.NetworkHandler;
 import dev._100media.capabilitysyncer.core.EntityCapability;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -184,9 +186,40 @@ public class AntHolder extends EntityCapability {
         return currentSize;
     }
 
+    public void resetCurrentSize() {
+        if (this.entity instanceof ServerPlayer player) {
+            this.currentSize = getSizeForMorph(player);
+            var holder = MorphHolderAttacher.getMorphHolderUnwrap(player);
+            if (holder != null) {
+                holder.setDimensionsOverride(currentSize.dimensions, true);
+            }
+            updateTracking();
+        }
+    }
+
+    public Size getSizeForMorph(Player player) {
+        var morph = MorphHolderAttacher.getCurrentMorphUnwrap(player);
+        if (morph == MorphInit.BABY_ANT.get()) {
+            return Size.SMALLEST;
+        }
+        else if (morph == MorphInit.BLACK_ANT.get()) {
+            return Size.SMALL;
+        }
+        else if (morph == MorphInit.FIRE_ANT.get()) {
+            return Size.MEDIUM;
+        }
+        else if (morph == MorphInit.KING_ANT.get()) {
+            return Size.LARGE;
+        }
+        else if (morph == MorphInit.OMEGA_ANT.get()) {
+            return Size.X_LARGE;
+        }
+        else return Size.NONE;
+    }
+
     public void setCurrentSize(Size currentSize) {
         this.currentSize = currentSize;
-        if (entity instanceof ServerPlayer player) {
+        if (entity instanceof Player player) {
             var holder = MorphHolderAttacher.getMorphHolderUnwrap(player);
             if (holder != null) {
                 holder.setDimensionsOverride(currentSize.dimensions, true);
@@ -218,13 +251,14 @@ public class AntHolder extends EntityCapability {
     }
 
     public enum Size {
+        NONE(null),
         SMALLEST(EntityDimensions.scalable(0.65f, 0.65f)),
         SMALL(EntityDimensions.scalable(1f, 1f)),
-        MEDIUM(EntityDimensions.scalable(1.5f, 2f)),
-        LARGE(EntityDimensions.scalable(2f, 3f)),
-        X_LARGE(EntityDimensions.scalable(2f, 6f));
+        MEDIUM(EntityDimensions.scalable(1.5f, 1f)),
+        LARGE(EntityDimensions.scalable(2f, 1f)),
+        X_LARGE(EntityDimensions.scalable(2f, 4f));
 
-        private final EntityDimensions dimensions;
+        public final EntityDimensions dimensions;
 
         Size(EntityDimensions dimensions) {
             this.dimensions = dimensions;
@@ -243,7 +277,7 @@ public class AntHolder extends EntityCapability {
         }
 
         public Size previous() {
-            if (ordinal() - 1 < 0) {
+            if (ordinal() - 1 <= 0) {
                 return this;
             }
             return values()[(ordinal() - 1) % values().length];

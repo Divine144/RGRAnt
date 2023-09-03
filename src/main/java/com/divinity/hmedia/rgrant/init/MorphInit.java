@@ -22,22 +22,22 @@ public class MorphInit {
 
     public static final RegistryObject<Morph> BABY_ANT = MORPHS.register("baby_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(10)
-            .swingDuration(7)
             .dimensions(0.65f, 0.65f)
             .eyeHeight(0.5f)
             .morphedTo(entity -> {
+                AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
                 entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 0, false, false, false));
             })
             .demorph(entity -> {
                 entity.removeEffect(MobEffects.DIG_SPEED);
-                resetDimensionsOverride(entity, AntHolder.Size.SMALLEST);
+                resetDimensionsOverride(entity);
             })
     ));
     public static final RegistryObject<Morph> BLACK_ANT = MORPHS.register("black_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(20)
-            .swingDuration(7)
             .dimensions(1f, 1f)
             .morphedTo(entity -> {
+                AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
                 entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 0, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 0, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false, false));
@@ -46,14 +46,15 @@ public class MorphInit {
                 entity.removeEffect(MobEffects.MOVEMENT_SPEED);
                 entity.removeEffect(MobEffects.DAMAGE_BOOST);
                 entity.removeEffect(MobEffects.DIG_SPEED);
-                resetDimensionsOverride(entity, AntHolder.Size.SMALL);
+                resetDimensionsOverride(entity);
             })
     ));
     public static final RegistryObject<Morph> FIRE_ANT = MORPHS.register("fire_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(40)
             .swingDuration(7)
-            .dimensions(1.5f, 2f)
+            .dimensions(1.5f, 1f)
             .morphedTo(entity -> {
+                AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
                 entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 1, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 1, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false, false));
@@ -64,14 +65,15 @@ public class MorphInit {
                 entity.removeEffect(MobEffects.DAMAGE_BOOST);
                 entity.removeEffect(MobEffects.DIG_SPEED);
                 entity.removeEffect(MobEffects.FIRE_RESISTANCE);
-                resetDimensionsOverride(entity, AntHolder.Size.MEDIUM);
+                resetDimensionsOverride(entity);
             })
     ));
     public static final RegistryObject<Morph> KING_ANT = MORPHS.register("king_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(60)
             .swingDuration(7)
-            .dimensions(2f, 3f)
+            .dimensions(2f, 1f)
             .morphedTo(entity -> {
+                AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
                 entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 2, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 2, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false, false));
@@ -94,14 +96,15 @@ public class MorphInit {
                     reachDistance.setBaseValue(reachDistance.getAttribute().getDefaultValue());
                     attackDistance.setBaseValue(attackDistance.getAttribute().getDefaultValue());
                 }
-                resetDimensionsOverride(entity, AntHolder.Size.LARGE);
+                resetDimensionsOverride(entity);
             })
     ));
     public static final RegistryObject<Morph> OMEGA_ANT = MORPHS.register("omega_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(100)
             .swingDuration(7)
-            .dimensions(2f, 6f)
+            .dimensions(2f, 4f)
             .morphedTo(entity -> {
+                AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
                 entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 4, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 4, false, false, false));
                 entity.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 3, false, false, false));
@@ -126,15 +129,11 @@ public class MorphInit {
                     reachDistance.setBaseValue(reachDistance.getAttribute().getDefaultValue());
                     attackDistance.setBaseValue(attackDistance.getAttribute().getDefaultValue());
                 }
-                resetDimensionsOverride(entity, AntHolder.Size.X_LARGE);
+                resetDimensionsOverride(entity);
             })
     ));
 
-    private static void resetDimensionsOverride(LivingEntity entity, AntHolder.Size size) {
-        var antHolder = AntHolderAttacher.getAntHolderUnwrap(entity);
-        if (antHolder != null) {
-            antHolder.setCurrentSizeNoDimensionUpdate(size);
-        }
+    private static void resetDimensionsOverride(LivingEntity entity) {
         var holder = MorphHolderAttacher.getMorphHolderUnwrap(entity);
         if (holder != null) {
             holder.setDimensionsOverride(null, true);

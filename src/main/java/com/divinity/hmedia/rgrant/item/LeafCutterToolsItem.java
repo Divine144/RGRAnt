@@ -109,14 +109,13 @@ public class LeafCutterToolsItem extends SimpleAnimatedItem {
             .then("flintsteel-RELEASE", Animation.LoopType.PLAY_ONCE)
             .thenLoop("flintsteel-ON");
 
-    // TODO: Change to pearl
     private static final RawAnimation FLINT_TO_PEARL = RawAnimation.begin()
             .then("flintsteel-TURNOFF", Animation.LoopType.PLAY_ONCE)
-            .then("bucket_RELEASE", Animation.LoopType.PLAY_ONCE)
-            .thenLoop("bucket_IDLE-EMPTY");
+            .then("enderpearl-RELEASE", Animation.LoopType.PLAY_ONCE)
+            .thenLoop("enderpearl-idle");
 
     private static final RawAnimation PEARL_TO_SHEARS = RawAnimation.begin()
-            .then("bucket_CLOSE", Animation.LoopType.PLAY_ONCE)
+            .then("enderpearl-TURNOFF", Animation.LoopType.PLAY_ONCE)
             .then("shears-RELEASE", Animation.LoopType.PLAY_ONCE)
             .thenLoop("shears-IDLE");
 

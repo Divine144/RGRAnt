@@ -31,6 +31,4 @@ public class TagInit {
     public static TagKey<Item> itemTag(String path) {
         return ItemTags.create(new ResourceLocation(RGRAnt.MODID, path));
     }
-
-
 }

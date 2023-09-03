@@ -3,6 +3,7 @@ package com.divinity.hmedia.rgrant.utils;
 import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
 import dev._100media.hundredmediaquests.goal.QuestGoal;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -28,6 +29,10 @@ public class AntUtils {
 
     public static boolean hasItemEitherHands(Player player, Item item) {
         return player.getItemInHand(InteractionHand.MAIN_HAND).getItem() == item || player.getItemInHand(InteractionHand.OFF_HAND).getItem() == item;
+    }
+
+    public static boolean hasItemEitherHands(Player player, TagKey<Item> tagKey) {
+        return player.getItemInHand(InteractionHand.MAIN_HAND).is(tagKey) || player.getItemInHand(InteractionHand.OFF_HAND).is(tagKey);
     }
 
     public static void scanHitWithFollowup(Entity shooter, double range, boolean hitFluids, Consumer<HitResult> followup) {

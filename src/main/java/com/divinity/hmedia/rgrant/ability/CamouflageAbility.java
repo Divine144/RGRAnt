@@ -1,5 +1,6 @@
 package com.divinity.hmedia.rgrant.ability;
 
+import com.divinity.hmedia.rgrant.cap.AntHolder;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
 import dev._100media.hundredmediaabilities.ability.Ability;
@@ -24,12 +25,14 @@ public class CamouflageAbility extends Ability {
                 if (result != null) {
                     BlockState blockState = level.getBlockState(result.getBlockPos());
                     if (!blockState.isAir()) {
+                        holder.setCurrentSize(AntHolder.Size.SMALLEST);
                         holder.setCamouflagedBlock(blockState.getBlock());
                     }
                 }
             }
             else {
                 player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0, false, false, false));
+                holder.resetCurrentSize();
                 holder.setCamouflagedBlock(Blocks.AIR);
             }
         }

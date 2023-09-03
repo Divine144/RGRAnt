@@ -16,8 +16,13 @@
 					"pivot": [0, -1.5, 0]
 				},
 				{
-					"name": "head",
+					"name": "bone",
 					"parent": "All",
+					"pivot": [0, 5, -1.5]
+				},
+				{
+					"name": "head",
+					"parent": "bone",
 					"pivot": [0, 5, -1.5],
 					"cubes": [
 						{
@@ -129,8 +134,13 @@
 					]
 				},
 				{
-					"name": "mantis2",
+					"name": "bone2",
 					"parent": "head",
+					"pivot": [2, 5, -8.5]
+				},
+				{
+					"name": "mantis2",
+					"parent": "bone2",
 					"pivot": [2, 4.48, -8.5],
 					"cubes": [
 						{
@@ -144,8 +154,13 @@
 					]
 				},
 				{
-					"name": "mantis1",
+					"name": "bone3",
 					"parent": "head",
+					"pivot": [-2, 4.5, -8.5]
+				},
+				{
+					"name": "mantis1",
+					"parent": "bone3",
 					"pivot": [-2, 4.48, -8.5],
 					"cubes": [
 						{
