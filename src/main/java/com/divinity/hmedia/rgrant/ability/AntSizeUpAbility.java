@@ -20,6 +20,7 @@ public class AntSizeUpAbility extends Ability {
             }
             else {
                 holder.setCurrentSize(size.next());
+                player.refreshDimensions();
                 player.displayClientMessage(Component.literal("Size Increased!").withStyle(ChatFormatting.GREEN), true);
             }
         }

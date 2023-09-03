@@ -165,7 +165,7 @@ public class ClientModEvents {
                             }
                             else {
                                 if (player.getVehicle() != null) {
-                                    poseStack.translate(0, 0.15, 0);
+                                    poseStack.translate(0, 0.10, 0);
                                 }
                                 poseStack.scale(scale, scale, scale);
                                 var morph = MorphHolderAttacher.getCurrentMorphUnwrap(player);

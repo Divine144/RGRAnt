@@ -1,12 +1,10 @@
 package com.divinity.hmedia.rgrant.event;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
+import com.divinity.hmedia.rgrant.cap.AntHolder;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import com.divinity.hmedia.rgrant.entity.AntEntity;
-import com.divinity.hmedia.rgrant.init.AbilityInit;
-import com.divinity.hmedia.rgrant.init.EffectInit;
-import com.divinity.hmedia.rgrant.init.MarkerInit;
-import com.divinity.hmedia.rgrant.init.SoundInit;
+import com.divinity.hmedia.rgrant.init.*;
 import com.divinity.hmedia.rgrant.mixin.EntityAccessor;
 import com.divinity.hmedia.rgrant.network.serverbound.EscapeNetPacket;
 import com.divinity.hmedia.rgrant.network.NetworkHandler;
@@ -28,8 +26,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.animal.camel.Camel;
@@ -44,15 +45,14 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.TradeWithVillagerEvent;
+import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -111,7 +111,10 @@ public class CommonForgeEvents {
                 });
             }
         }
-        if (event.getSource().getDirectEntity() instanceof AntEntity antEntity) {
+        if (event.getSource().getEntity() instanceof ServerPlayer player && event.getSource().is(DamageTypes.PLAYER_EXPLOSION)) {
+            AntUtils.addToGenericQuestGoal(player, AntArmyKillEndermanGoal.class);
+        }
+        else if (event.getSource().getDirectEntity() instanceof AntEntity antEntity) {
             if (!antEntity.level().isClientSide) {
                 if (event.getEntity() instanceof EnderMan && antEntity.getOwner() instanceof ServerPlayer player) {
                     AntUtils.addToGenericQuestGoal(player, AntArmyKillEndermanGoal.class);
@@ -142,10 +145,49 @@ public class CommonForgeEvents {
     }
 
     @SubscribeEvent
-    public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
-        if (event.getEntity() instanceof Camel camel) {
-            if (camel.getControllingPassenger() instanceof ServerPlayer player) {
-                AntUtils.addToGenericQuestGoal(player, CamelJumpGoal.class);
+    public static void onJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof ServerPlayer entity) {
+            var morph = MorphHolderAttacher.getCurrentMorphUnwrap(entity);
+            if (morph != null) {
+                if (morph == MorphInit.BABY_ANT.get()) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 0, false, false, false));
+                }
+                else if (morph == MorphInit.BLACK_ANT.get()) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 0, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 0, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false, false));
+                }
+                else if (morph == MorphInit.FIRE_ANT.get()) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 1, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 1, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, -1, 0, false, false, false));
+                }
+                else if (morph == MorphInit.KING_ANT.get()) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 2, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 2, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, -1, 0, false, false, false));
+                    var reachDistance = entity.getAttribute(ForgeMod.BLOCK_REACH.get());
+                    var attackDistance = entity.getAttribute(ForgeMod.ENTITY_REACH.get());
+                    if (reachDistance != null && attackDistance != null) {
+                        reachDistance.setBaseValue(reachDistance.getAttribute().getDefaultValue() + 3);
+                        attackDistance.setBaseValue(attackDistance.getAttribute().getDefaultValue() + 3);
+                    }
+                }
+                else if (morph == MorphInit.OMEGA_ANT.get()) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, 4, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, 4, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, 3, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, -1, 1, false, false, false));
+                    entity.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, -1, 0, false, false, false));
+                    var reachDistance = entity.getAttribute(ForgeMod.BLOCK_REACH.get());
+                    var attackDistance = entity.getAttribute(ForgeMod.ENTITY_REACH.get());
+                    if (reachDistance != null && attackDistance != null) {
+                        reachDistance.setBaseValue(reachDistance.getAttribute().getDefaultValue() + 5);
+                        attackDistance.setBaseValue(attackDistance.getAttribute().getDefaultValue() + 5);
+                    }
+                }
             }
         }
     }

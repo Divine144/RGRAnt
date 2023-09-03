@@ -20,6 +20,7 @@ public class AntSizeDownAbility extends Ability {
             }
             else {
                 holder.setCurrentSize(size.previous());
+                player.refreshDimensions();
                 player.displayClientMessage(Component.literal("Size Decreased!").withStyle(ChatFormatting.GREEN), true);
             }
         }

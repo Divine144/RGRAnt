@@ -145,7 +145,7 @@ public class SkillInit {
     ));
     // Utility
     public static final RegistryObject<Skill> CAMOUFLAGE = SKILLS.register("camouflage", () -> new SimpleSkill(
-            Component.literal("CamouflageAbility"),
+            Component.literal("Camouflage"),
             Component.literal("""
                     Whatever block is being looked at when this ability is used; the player will turn into that block.
                     Press the ability again to deactivate.

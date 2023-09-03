@@ -38,7 +38,6 @@ public class AcidSprayItem extends Item {
         if (!pLevel.isClientSide) {
             if (pLivingEntity instanceof ServerPlayer player) {
                 if (pRemainingUseDuration % 2 == 0) {
-
                     var entity = EntityInit.ACID_ENTITY.get().create(pLevel);
                     if (entity != null) {
                         entity.setPos(player.getX(), player.getEyeY() - 0.15, player.getZ());
