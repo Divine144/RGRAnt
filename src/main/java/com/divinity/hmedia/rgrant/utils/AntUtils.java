@@ -16,6 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
+import software.bernie.geckolib.cache.object.GeoBone;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -34,6 +35,26 @@ public class AntUtils {
 
     public static boolean hasItemEitherHands(Player player, TagKey<Item> tagKey) {
         return player.getItemInHand(InteractionHand.MAIN_HAND).is(tagKey) || player.getItemInHand(InteractionHand.OFF_HAND).is(tagKey);
+    }
+
+    @Nullable
+    public static GeoBone getChildBoneOfName(String name, GeoBone parentBone) {
+        if (parentBone.getChildBones().isEmpty()) return null;
+        for (var bones : parentBone.getChildBones()) {
+            if (bones.getName().equals(name)) {
+                return bones;
+            }
+        }
+
+        // At this point we know the parent's child bones do not match the name, so we recursively search for it
+        GeoBone bone = null;
+        for (var childBones : parentBone.getChildBones()) {
+            bone = getChildBoneOfName(name, childBones);
+            if (bone != null) {
+                break;
+            }
+        }
+        return bone;
     }
 
     public static void scanHitWithFollowup(Entity shooter, double range, boolean hitFluids, Consumer<HitResult> followup) {

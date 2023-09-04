@@ -8,6 +8,7 @@ import com.divinity.hmedia.rgrant.client.renderer.AcidEntityRenderer;
 import com.divinity.hmedia.rgrant.client.renderer.FakePlayerRenderer;
 import com.divinity.hmedia.rgrant.client.renderer.StingerEntityRenderer;
 import com.divinity.hmedia.rgrant.init.*;
+import com.divinity.hmedia.rgrant.utils.AntUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -59,6 +60,8 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
+import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.animation.RawAnimation;
@@ -66,7 +69,9 @@ import software.bernie.geckolib.core.object.Color;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = RGRAnt.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -90,7 +95,27 @@ public class ClientModEvents {
         createSimpleMorphRenderer(MorphInit.BLACK_ANT.get(), "black_ant", new AntAnimatable(), 1.0f);
         createSimpleMorphRenderer(MorphInit.FIRE_ANT.get(), "fire_ant", new AntAnimatable(), 1.0f);
         createSimpleMorphRenderer(MorphInit.KING_ANT.get(), "king_ant", new AntAnimatable(), 1.0f);
-        createSimpleMorphRenderer(MorphInit.OMEGA_ANT.get(), "omega_ant", new AntAnimatable(), 1.0f);
+        createSimpleMorphRenderer(MorphInit.OMEGA_ANT.get(), "omega_ant", new AntAnimatable() {
+            private static final RawAnimation CROUCH_FOR_WALK = RawAnimation.begin().thenLoop("crouchforwalk");
+
+            @Override
+            protected PlayState motionAnimationEvent(AnimationState<? extends MotionAttackAnimatable> state) {
+                AnimationController<?> controller = state.getController();
+                if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {
+                    controller.transitionLength(0);
+                    if (player.isShiftKeyDown()) {
+                        controller.setAnimation(!state.isMoving() ? CROUCH : CROUCH_FOR_WALK);
+                    }
+                    else if (state.isMoving()) {
+                        controller.setAnimation(player.isSprinting() && !player.isCrouching() ? RUN : WALK);
+                    }
+                    else {
+                        controller.setAnimation(IDLE);
+                    }
+                }
+                return PlayState.CONTINUE;
+            }
+        }, 1.0f);
     }
 
     @SubscribeEvent
@@ -317,8 +342,27 @@ public class ClientModEvents {
                         float green = renderColor.getGreenFloat();
                         float blue = renderColor.getBlueFloat();
                         float alpha = renderColor.getAlphaFloat();
-                        float f2 = Mth.lerp(partialTick, Mth.wrapDegrees(entity.tickCount) - 1, Mth.wrapDegrees(entity.tickCount));
-                        poseStack.mulPose(Axis.YP.rotationDegrees(f2));
+                        Optional<GeoBone> parentBone = model.getBone("bone36");
+                        if (parentBone.isPresent()) {
+                            List<CoreGeoBone> outerRingBones = List.of(
+                                    model.searchForChildBone(parentBone.get(), "bone38"),
+                                    model.searchForChildBone(parentBone.get(), "bone47"),
+                                    model.searchForChildBone(parentBone.get(), "bone55"),
+                                    model.searchForChildBone(parentBone.get(), "bone64")
+                            );
+                            boolean negative = false;
+                            for (CoreGeoBone bone : outerRingBones) {
+                                float f3 = Mth.wrapDegrees(bone.getRotY() + 0.01f);
+                                if (negative) {
+                                    f3 = Mth.wrapDegrees(bone.getRotY() - 0.01f);
+                                    negative = false;
+                                }
+                                else negative = true;
+                                bone.updateRotation(0, f3, 0);
+                                bone.updatePivot(0, 0, 0);
+                                bone.updatePosition(0, 0, 0);
+                            }
+                        }
                         this.getRenderer().actuallyRender(poseStack, animatable, model,
                                 renderType, bufferSource, bufferSource.getBuffer(renderType), false, partialTick, packedLight,
                                 OverlayTexture.NO_OVERLAY, red, green, blue, alpha);

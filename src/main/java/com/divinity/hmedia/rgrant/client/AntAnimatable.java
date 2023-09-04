@@ -10,11 +10,11 @@ import software.bernie.geckolib.core.object.PlayState;
 
 public class AntAnimatable extends MotionAttackAnimatable {
 
-    private static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("attack");
-    private static final RawAnimation CROUCH = RawAnimation.begin().thenLoop("crouch");
-    private static final RawAnimation RUN = RawAnimation.begin().thenLoop("run");
-    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
-    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    protected static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("attack");
+    protected static final RawAnimation CROUCH = RawAnimation.begin().thenLoop("crouch");
+    protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("run");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
 
     public AntAnimatable() {}
 

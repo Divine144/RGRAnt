@@ -878,6 +878,120 @@
 					}
 				}
 			}
+		},
+		"crouchforwalk": {
+			"loop": true,
+			"bones": {
+				"all": {
+					"position": {
+						"vector": [0, -11.9, 0],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"TOP": {
+					"rotation": {
+						"vector": [0.85827, 9.1288, 7.84922]
+					}
+				},
+				"ginocchio": {
+					"rotation": {
+						"vector": [47.22101, 21.29103, -4.77998]
+					},
+					"position": {
+						"vector": [0.8, 1.4, 1]
+					}
+				},
+				"polpaccio": {
+					"rotation": {
+						"vector": [-23.50901, 21.6813, -7.86818]
+					}
+				},
+				"foot": {
+					"rotation": {
+						"vector": [23.13733, -17.56945, -7.34985]
+					}
+				},
+				"right_leg": {
+					"rotation": {
+						"vector": [-33.0196, 22.55133, 39.55133],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"SHOULDER": {
+					"rotation": {
+						"vector": [16.60546, 14.13039, 6.3138],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"ARM": {
+					"rotation": {
+						"vector": [-33.30961, 10.93407, 6.02872]
+					},
+					"position": {
+						"vector": [1.9, 0, 0]
+					}
+				},
+				"hand": {
+					"rotation": {
+						"vector": [0, 30, 18]
+					}
+				},
+				"SHOULDER2": {
+					"rotation": {
+						"vector": [72.67995, -22.27073, 9.24971],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"ARM2": {
+					"rotation": {
+						"vector": [-105.80577, -10.323, 7.70527]
+					}
+				},
+				"hand2": {
+					"rotation": {
+						"vector": [0, -7, -21]
+					}
+				},
+				"TAIL": {
+					"rotation": {
+						"vector": [-15.81715, 9.19784, -3.94125],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"left_leg": {
+					"rotation": {
+						"vector": [-19.25656, -11.86554, -55.48005],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"ginocchio2": {
+					"rotation": {
+						"vector": [19.40804, -3.40487, 19.71975]
+					}
+				},
+				"polpaccio2": {
+					"rotation": {
+						"vector": [0, 0, 20]
+					}
+				},
+				"bone27": {
+					"rotation": {
+						"vector": [5, 0, 0],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"bone": {
+					"rotation": {
+						"vector": [5, 0, 0],
+						"easing": "easeInOutQuad"
+					}
+				},
+				"octagon": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
 		}
 	},
 	"geckolib_format_version": 2
