@@ -94,17 +94,19 @@ public class ClientModEvents {
         createSimpleMorphRenderer(MorphInit.BABY_ANT.get(), "baby_ant", new AntAnimatable(), 1.0f);
         createSimpleMorphRenderer(MorphInit.BLACK_ANT.get(), "black_ant", new AntAnimatable(), 1.0f);
         createSimpleMorphRenderer(MorphInit.FIRE_ANT.get(), "fire_ant", new AntAnimatable(), 1.0f);
-        createSimpleMorphRenderer(MorphInit.KING_ANT.get(), "king_ant", new AntAnimatable(), 1.0f);
-        createSimpleMorphRenderer(MorphInit.OMEGA_ANT.get(), "omega_ant", new AntAnimatable() {
-            private static final RawAnimation CROUCH_FOR_WALK = RawAnimation.begin().thenLoop("crouchforwalk");
+        createSimpleMorphRenderer(MorphInit.KING_ANT.get(), "king_ant", new AntAnimatable() {
+            private static final RawAnimation FLY = RawAnimation.begin().thenLoop("fly");
 
             @Override
             protected PlayState motionAnimationEvent(AnimationState<? extends MotionAttackAnimatable> state) {
                 AnimationController<?> controller = state.getController();
                 if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {
                     controller.transitionLength(0);
-                    if (player.isShiftKeyDown()) {
-                        controller.setAnimation(!state.isMoving() ? CROUCH : CROUCH_FOR_WALK);
+                    if (!player.onGround() && player.getDeltaMovement().y >= 0) {
+                        controller.setAnimation(FLY);
+                    }
+                    else if (player.isShiftKeyDown()) {
+                        controller.setAnimation(CROUCH);
                     }
                     else if (state.isMoving()) {
                         controller.setAnimation(player.isSprinting() && !player.isCrouching() ? RUN : WALK);
@@ -115,6 +117,31 @@ public class ClientModEvents {
                 }
                 return PlayState.CONTINUE;
             }
+        }, 1.0f);
+        createSimpleMorphRenderer(MorphInit.OMEGA_ANT.get(), "omega_ant", new AntAnimatable() {
+            private static final RawAnimation CROUCH_FOR_WALK = RawAnimation.begin().thenLoop("crouchwalk");
+
+            @Override
+            protected PlayState motionAnimationEvent(AnimationState<? extends MotionAttackAnimatable> state) {
+                AnimationController<?> controller = state.getController();
+                if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {
+                    controller.transitionLength(5);
+                    if (state.isMoving()) {
+                        if (player.isSprinting()) {
+                            controller.setAnimation(!player.isCrouching() ? RUN : CROUCH_FOR_WALK);
+                        }
+                        else controller.setAnimation(!player.isCrouching() ? WALK : CROUCH_FOR_WALK);
+                    }
+                    else if (player.isCrouching()) {
+                        controller.setAnimation(CROUCH);
+                    }
+                    else {
+                        controller.setAnimation(IDLE);
+                    }
+                }
+                return PlayState.CONTINUE;
+            }
+
         }, 1.0f);
     }
 
@@ -342,25 +369,35 @@ public class ClientModEvents {
                         float green = renderColor.getGreenFloat();
                         float blue = renderColor.getBlueFloat();
                         float alpha = renderColor.getAlphaFloat();
+                        // Rotation Code
+                        Optional<GeoBone> innerParentBone = model.getBone("bone35");
                         Optional<GeoBone> parentBone = model.getBone("bone36");
-                        if (parentBone.isPresent()) {
-                            List<CoreGeoBone> outerRingBones = List.of(
+                        if (parentBone.isPresent() && innerParentBone.isPresent()) {
+                            List<CoreGeoBone> ringBones = List.of(
                                     model.searchForChildBone(parentBone.get(), "bone38"),
                                     model.searchForChildBone(parentBone.get(), "bone47"),
                                     model.searchForChildBone(parentBone.get(), "bone55"),
-                                    model.searchForChildBone(parentBone.get(), "bone64")
+                                    model.searchForChildBone(parentBone.get(), "bone64"),
+                                    model.searchForChildBone(innerParentBone.get(), "bone19"),
+                                    model.searchForChildBone(innerParentBone.get(), "bone28"),
+                                    model.searchForChildBone(innerParentBone.get(), "bone16"),
+                                    model.searchForChildBone(innerParentBone.get(), "bone4")
                             );
                             boolean negative = false;
-                            for (CoreGeoBone bone : outerRingBones) {
-                                float f3 = Mth.wrapDegrees(bone.getRotY() + 0.01f);
-                                if (negative) {
-                                    f3 = Mth.wrapDegrees(bone.getRotY() - 0.01f);
-                                    negative = false;
+                            parentBone.get().updateRotation(0, 0, 0);
+                            innerParentBone.get().updateRotation(0, 0, 0);
+                            for (CoreGeoBone bone : ringBones) {
+                                if (!bone.isHidden()) {
+                                    float f3 = Mth.wrapDegrees(bone.getRotY() + 0.01f);
+                                    if (negative) {
+                                        f3 = Mth.wrapDegrees(bone.getRotY() - 0.01f);
+                                        negative = false;
+                                    }
+                                    else negative = true;
+                                    bone.updateRotation(0, f3, 0);
+                                    bone.updatePivot(0, 0, 0);
+                                    bone.updatePosition(0, 0, 0);
                                 }
-                                else negative = true;
-                                bone.updateRotation(0, f3, 0);
-                                bone.updatePivot(0, 0, 0);
-                                bone.updatePosition(0, 0, 0);
                             }
                         }
                         this.getRenderer().actuallyRender(poseStack, animatable, model,
@@ -372,5 +409,17 @@ public class ClientModEvents {
             });
             return renderer;
         });
+    }
+
+    private static float wrapDegreesTo(float degree, float value) {
+        float f = value % degree;
+        if (f >= degree) {
+            f -= degree;
+        }
+
+        if (f < -degree) {
+            f += degree;
+        }
+        return f;
     }
 }

@@ -27,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 
@@ -66,25 +67,32 @@ public class MandiblesItem extends AnimatedSwordItem {
         if (entity.level().isClientSide) return InteractionResult.SUCCESS;
         ItemStack itemStack = getHeadForEntity(entity);
         if (!itemStack.isEmpty()) {
-            playerIn.getInventory().add(itemStack);
-            entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
-            playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            if (!playerIn.getInventory().contains(itemStack)) {
+                playerIn.getInventory().add(itemStack);
+                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            }
             return InteractionResult.SUCCESS;
         }
         else if (entity instanceof Player player) {
             ItemStack playerHeadStack = new ItemStack(Items.PLAYER_HEAD);
             GameProfile gameprofile = player.getGameProfile();
             playerHeadStack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gameprofile));
-            playerIn.getInventory().add(playerHeadStack);
-            MarkerHolderAttacher.getMarkerHolder(player).ifPresent(h -> h.addMarker(MarkerInit.MANDIBLES_MARKER.get(), false));
-            player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
-            playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            if (!playerIn.getInventory().contains(playerHeadStack)) {
+                playerIn.getInventory().add(playerHeadStack);
+                MarkerHolderAttacher.getMarkerHolder(player).ifPresent(h -> h.addMarker(MarkerInit.MANDIBLES_MARKER.get(), false));
+                player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            }
             return InteractionResult.SUCCESS;
         }
         else {
-            playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
-            entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
-            playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            ItemStack pickedStack = entity.getPickedResult(null);
+            if (pickedStack != null && pickedStack.getItem() instanceof ForgeSpawnEggItem) {
+                playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
+                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            }
         }
         return InteractionResult.CONSUME;
     }

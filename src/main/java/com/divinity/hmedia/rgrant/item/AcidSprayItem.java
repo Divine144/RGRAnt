@@ -40,7 +40,7 @@ public class AcidSprayItem extends Item {
                 if (pRemainingUseDuration % 2 == 0) {
                     var entity = EntityInit.ACID_ENTITY.get().create(pLevel);
                     if (entity != null) {
-                        entity.setPos(player.getX(), player.getEyeY() - 0.15, player.getZ());
+                        entity.setPos(player.getX(), player.getEyeY() - 0.55, player.getZ());
                         entity.setOwner(player);
                         entity.setNoGravity(true);
                         entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 1.5F, 0);

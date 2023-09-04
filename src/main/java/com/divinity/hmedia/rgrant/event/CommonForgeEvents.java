@@ -34,16 +34,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.animal.camel.Camel;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.entity.PartEntity;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityEvent;
@@ -149,6 +153,20 @@ public class CommonForgeEvents {
     @SubscribeEvent
     public static void onJoinLevel(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ServerPlayer entity) {
+            var optional = entity.serverLevel().players()
+                    .stream()
+                    .filter(p ->
+                        MorphHolderAttacher.getCurrentMorph(p).isPresent() &&
+                        AntHolderAttacher.getAntHolder(p).filter(m -> m.getGigaAntTicks() > 0).isPresent())
+                    .findAny();
+            if (optional.isPresent()) {
+                entity.serverLevel().players()
+                    .stream()
+                    .filter(p -> MorphHolderAttacher.getCurrentMorph(p).isEmpty())
+                    .forEach(p -> {
+                        p.addEffect(new MobEffectInstance(MobEffects.GLOWING, -1, 0, false, false ,false));
+                    });
+            }
             var morph = MorphHolderAttacher.getCurrentMorphUnwrap(entity);
             if (morph != null) {
                 if (morph == MorphInit.BABY_ANT.get()) {
@@ -301,6 +319,26 @@ public class CommonForgeEvents {
     @SubscribeEvent
     public static void netInteract(PlayerInteractEvent.EntityInteractSpecific event) {
         if (event.isCanceled()) return;
+
+        if (event.getEntity() instanceof ServerPlayer player) {
+            if (event.getTarget() instanceof Villager villager) {
+                if (AntUtils.hasItemEitherHands(player, ItemInit.MANDIBLES.get())) {
+                    player.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
+                    villager.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                    player.level().playSound(null, player.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                }
+            }
+            else if (event.getTarget() instanceof PartEntity<?> partEntity) {
+                var entity = partEntity.getParent();
+                if (entity instanceof EnderDragon enderDragon) {
+                    if (!player.getInventory().contains(Items.DRAGON_HEAD.getDefaultInstance())) {
+                        player.getInventory().add(new ItemStack(Items.DRAGON_HEAD));
+                        enderDragon.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                        player.level().playSound(null, player.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                    }
+                }
+            }
+        }
         if (event.getTarget() instanceof LivingEntity living && living.hasEffect(EffectInit.NETTED.get()) && event.getEntity().isShiftKeyDown()) {
             AntHolderAttacher.getAntHolder(event.getEntity()).ifPresent(holder -> {
                 if (holder.getCaptured() instanceof LivingEntity) {

@@ -13,12 +13,14 @@ import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,26 +54,28 @@ public class VenomousStingItem extends SimpleAnimatedItem {
     }
 
     @Override
-    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged) {
+    public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration) {
         if (pLivingEntity instanceof Player player) {
-            int i = this.getUseDuration(pStack) - pTimeCharged;
+            int i = this.getUseDuration(pStack) - pRemainingUseDuration;
             if (i < 0) return;
-            if (!pLevel.isClientSide) {
-                var entity = EntityInit.STINGER_ENTITY.get().create(pLevel);
-                if (entity != null) {
-                    entity.setPos(player.getX(), player.getEyeY() - 0.15, player.getZ());
-                    entity.setOwner(player);
-                    entity.setNoGravity(true);
-                    entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 1.5F, 0);
-                    entity.setYRot(-Mth.wrapDegrees(player.getYRot()));
-                    entity.setXRot(-Mth.wrapDegrees(player.getXRot()));
-                    entity.xRotO = -Mth.wrapDegrees(player.xRotO);
-                    entity.yRotO = -Mth.wrapDegrees(player.yRotO);
-                    player.level().addFreshEntity(entity);
+            if (pRemainingUseDuration % 10 == 0) {
+                if (!pLevel.isClientSide) {
+                    var entity = EntityInit.STINGER_ENTITY.get().create(pLevel);
+                    if (entity != null) {
+                        entity.setPos(player.getX(), player.getEyeY() - 0.15, player.getZ());
+                        entity.setOwner(player);
+                        entity.setNoGravity(true);
+                        entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 1.5F, 0);
+                        entity.setYRot(-Mth.wrapDegrees(player.getYRot()));
+                        entity.setXRot(-Mth.wrapDegrees(player.getXRot()));
+                        entity.xRotO = -Mth.wrapDegrees(player.xRotO);
+                        entity.yRotO = -Mth.wrapDegrees(player.yRotO);
+                        player.level().addFreshEntity(entity);
+                    }
                 }
+                player.level().playSound(null, player.blockPosition(), SoundInit.STING.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                player.awardStat(Stats.ITEM_USED.get(this));
             }
-            player.level().playSound(null, player.blockPosition(), SoundInit.STING.get(), SoundSource.PLAYERS, 0.5f, 1f);
-            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
 
@@ -116,7 +120,6 @@ public class VenomousStingItem extends SimpleAnimatedItem {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
             return InteractionResultHolder.consume(itemStack);
-
         }
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pUsedHand);
     }

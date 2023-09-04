@@ -6,6 +6,7 @@ import dev._100media.hundredmediaabilities.ability.Ability;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraftforge.common.ForgeMod;
@@ -22,7 +23,14 @@ public class GigaAntAbility extends Ability {
                 player.serverLevel().getPlayers(p -> !p.hasEffect(MobEffects.GLOWING) && MorphHolderAttacher.getCurrentMorph(p).isEmpty())
                         .forEach(p -> p.addEffect(new MobEffectInstance(MobEffects.GLOWING, -1, 0, false, false, false)));
                 holder.setGigaAntTicks(20 * 60);
-                AntUtils.amplifyCurrentEffect(player, false, MobEffects.MOVEMENT_SPEED, MobEffects.DAMAGE_BOOST, MobEffects.JUMP);
+                var speed = player.getEffect(MobEffects.MOVEMENT_SPEED);
+                var dmg = player.getEffect(MobEffects.DAMAGE_BOOST);
+                var jump = player.getEffect(MobEffects.JUMP);
+                if (speed != null && dmg != null && jump != null) {
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, speed.getAmplifier() + speed.getAmplifier(), false, false ,false));
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() + dmg.getAmplifier(), false, false ,false));
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() + dmg.getAmplifier(), false, false ,false));
+                }
                 if (reachDistance != null && attackDistance != null) {
                     reachDistance.setBaseValue(reachDistance.getBaseValue() + 20);
                     attackDistance.setBaseValue(attackDistance.getBaseValue() + 20);
@@ -32,7 +40,14 @@ public class GigaAntAbility extends Ability {
                 player.serverLevel().getPlayers(p -> p.hasEffect(MobEffects.GLOWING) && MorphHolderAttacher.getCurrentMorph(p).isEmpty())
                         .forEach(p -> p.removeEffect(MobEffects.GLOWING));
                 holder.setGigaAntTicks(0);
-                AntUtils.amplifyCurrentEffect(player, true, MobEffects.MOVEMENT_SPEED, MobEffects.DAMAGE_BOOST, MobEffects.JUMP);
+                var speed = player.getEffect(MobEffects.MOVEMENT_SPEED);
+                var dmg = player.getEffect(MobEffects.DAMAGE_BOOST);
+                var jump = player.getEffect(MobEffects.JUMP);
+                if (speed != null && dmg != null && jump != null) {
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, speed.getAmplifier() / 2, false, false ,false));
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
+                }
                 if (reachDistance != null && attackDistance != null) {
                     reachDistance.setBaseValue(Math.max(reachDistance.getAttribute().getDefaultValue(), reachDistance.getBaseValue() - 20));
                     attackDistance.setBaseValue(Math.max(attackDistance.getAttribute().getDefaultValue(), attackDistance.getBaseValue() - 20));
