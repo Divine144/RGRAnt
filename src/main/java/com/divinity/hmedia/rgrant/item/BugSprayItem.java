@@ -84,7 +84,7 @@ public class BugSprayItem extends SimpleAnimatedItem {
                         }
                     }
                 }
-                ((ServerLevel) pLevel).sendParticles(ParticleTypes.LARGE_SMOKE, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 4, 0, 0, 0, 0);
+                ((ServerLevel) pLevel).sendParticles(ParticleTypes.CLOUD, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 4, 0, 0, 0, 0);
             });
             triggerAnim(pPlayer, GeoItem.getOrAssignId(itemStack, (ServerLevel) pPlayer.level()), "controller", "spray");
             pPlayer.level().playSound(null, pPlayer.blockPosition(), SoundInit.BUG_SPRAY.get(), SoundSource.PLAYERS, 0.5f, 1f);

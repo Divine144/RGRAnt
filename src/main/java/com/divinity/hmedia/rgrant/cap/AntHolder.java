@@ -32,7 +32,6 @@ public class AntHolder extends EntityCapability {
     private Size currentSize = Size.SMALL;
     private static final int ESCAPE_REQUIRED_SWINGS = 5;
     private UUID captured = null;
-
     private Block camouflagedBlock = Blocks.AIR;
 
     private double remainingShield;

@@ -42,6 +42,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -55,6 +56,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.util.List;
 
@@ -187,28 +189,6 @@ public class CommonForgeEvents {
                         reachDistance.setBaseValue(reachDistance.getAttribute().getDefaultValue() + 5);
                         attackDistance.setBaseValue(attackDistance.getAttribute().getDefaultValue() + 5);
                     }
-                }
-            }
-        }
-    }
-
-    // WARNING: Extremely cursed
-    static boolean stopIt = false;
-
-    @SubscribeEvent
-    public static void onEntityTick(LivingEvent.LivingTickEvent event) {
-        if (event.getEntity() instanceof Camel camel && !camel.level().isClientSide) {
-            if (!camel.isDashing()) {
-                if (camel.getControllingPassenger() instanceof ServerPlayer) {
-                    stopIt = true;
-                }
-            }
-            if (camel.isDashing() && camel.onGround() && camel.getJumpCooldown() > 0) {
-                if (camel.getControllingPassenger() instanceof ServerPlayer player) {
-                    if (!stopIt) {
-                        AntUtils.addToGenericQuestGoal(player, CamelJumpGoal.class);
-                    }
-                    else stopIt = false;
                 }
             }
         }

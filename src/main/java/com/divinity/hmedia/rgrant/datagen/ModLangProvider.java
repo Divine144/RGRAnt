@@ -64,7 +64,7 @@ public class ModLangProvider extends LanguageProvider {
         // Quest Display Descriptions
         add("quest.goal.rgrant.ant_army_kill_enderman_goal", "Have \"Ant Army\" Ants kill Endermen");
         add("quest.goal.rgrant.surge_protector_advancement_goal", "Earn the Advancement \"Surge Protector\"");
-        add("quest.goal.rgrant.make_camel_jump_goal", "Make a Camel Jump 10 Times");
+        add("quest.goal.rgrant.make_camel_jump_goal", "Make a Camel Dash 10 Times");
         add("quest.goal.rgrant.give_allay_item_goal", "Give an Allay Any Item");
         add("quest.goal.rgrant.goat_lose_horn_goal", "Make Goats Lose Their Horns");
         add("quest.goal.rgrant.hit_villagers_quest_goal", "Hit Villagers");

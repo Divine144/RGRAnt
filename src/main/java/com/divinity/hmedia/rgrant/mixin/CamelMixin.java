@@ -14,13 +14,14 @@ public class CamelMixin {
 
     @Inject(
             method = "setDashing",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At("HEAD")
     )
     public void setDashing(boolean pDashing, CallbackInfo ci) {
         Camel instance = (Camel) (Object) this;
         if (instance.getControllingPassenger() instanceof ServerPlayer player) {
-            AntUtils.addToGenericQuestGoal(player, CamelJumpGoal.class);
+            if (pDashing) {
+                AntUtils.addToGenericQuestGoal(player, CamelJumpGoal.class);
+            }
         }
     }
 }
