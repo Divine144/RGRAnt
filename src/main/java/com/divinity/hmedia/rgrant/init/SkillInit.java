@@ -62,7 +62,7 @@ public class SkillInit {
             Component.literal("Fire Ant"),
             Component.literal("%s Hearts, Strength %s, Speed %s, Haste %s, Fire Immunity".formatted(20, "II", "II", "II")),
             Arrays.asList(
-                    new ItemSkillRequirement(() -> Items.BLAZE_ROD, 12),
+                    new ItemSkillRequirement(() -> Items.SPONGE, 16),
                     new ItemSkillRequirement(() -> Items.NETHER_WART, 16),
                     new ItemSkillRequirement(() -> Items.RECOVERY_COMPASS, 1)
             ),
@@ -72,8 +72,8 @@ public class SkillInit {
             Component.literal("King Ant"),
             Component.literal("%s Hearts, Strength %s, Speed %s, Haste %s, Fire Immunity, +%s Block Reach".formatted(30, "III", "III", "II", 3)),
             Arrays.asList(
-                    new ItemSkillRequirement(() -> Items.MAGMA_CREAM, 12),
-                    new ItemSkillRequirement(() -> Items.SPONGE, 16),
+                    new ItemSkillRequirement(() -> Items.NAUTILUS_SHELL, 1),
+                    new ItemSkillRequirement(() -> Items.BLAZE_ROD, 12),
                     new ItemSkillRequirement(() -> Items.SKELETON_SKULL, 1),
                     new ItemSkillRequirement(() -> Items.WITHER_SKELETON_SKULL, 1),
                     new ItemSkillRequirement(() -> Items.CREEPER_HEAD, 1),
@@ -85,7 +85,7 @@ public class SkillInit {
             MorphInit.KING_ANT
     ));
     public static final RegistryObject<Skill> OMEGA_ANT = SKILLS.register("omega_ant", () -> new MorphSkill(
-            Component.literal("Omega Ant"),
+            Component.literal("Omega Velvet Ant"),
             Component.literal("%s Hearts, Strength %s, Speed %s, Jump Boost %s, Haste %s, Fire Immunity, +%s Block Reach".formatted(50, "V", "V", "IV", "II", 5)),
             Arrays.asList(
                     new ItemSkillRequirement(() -> Items.ELYTRA, 1),
