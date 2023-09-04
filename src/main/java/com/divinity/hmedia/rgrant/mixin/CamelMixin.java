@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class CamelMixin {
 
     @Inject(
-            method = "setDashing(Z)V",
+            method = "setDashing",
             at = @At("HEAD"),
-            remap = false
+            cancellable = true
     )
     public void setDashing(boolean pDashing, CallbackInfo ci) {
         Camel instance = (Camel) (Object) this;

@@ -2,6 +2,7 @@ package com.divinity.hmedia.rgrant.utils;
 
 import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
 import dev._100media.hundredmediaquests.goal.QuestGoal;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
@@ -148,10 +149,21 @@ public class AntUtils {
                 .stream().sorted(getEntityComparator(relativeEntity)).filter(filter).collect(Collectors.toList());
     }
 
+    public static <T extends LivingEntity> List<T> getEntitiesInRange(BlockPos relativePos, Level level, Class<T> targets, double xBound, double yBound, double zBound, Predicate<T> filter) {
+        return level.getEntitiesOfClass(targets,
+                        new AABB(relativePos.getX() - xBound, relativePos.getY() - yBound, relativePos.getZ() - zBound,
+                                relativePos.getX() + xBound, relativePos.getY() + yBound, relativePos.getZ() + zBound))
+                .stream().sorted(getBlockComparator(relativePos)).filter(filter).collect(Collectors.toList());
+    }
+
     /**
      * Returns a comparator which compares entities' distances to a given LivingEntity
      */
     private static Comparator<Entity> getEntityComparator(LivingEntity other) {
         return Comparator.comparing(entity -> entity.distanceToSqr(other.getX(), other.getY(), other.getZ()));
+    }
+
+    private static Comparator<LivingEntity> getBlockComparator(BlockPos other) {
+        return Comparator.comparing(entity -> entity.blockPosition().compareTo(other));
     }
 }

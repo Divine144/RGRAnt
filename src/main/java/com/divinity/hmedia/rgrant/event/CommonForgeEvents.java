@@ -192,6 +192,28 @@ public class CommonForgeEvents {
         }
     }
 
+    // WARNING: Extremely cursed
+    static boolean stopIt = false;
+
+    @SubscribeEvent
+    public static void onEntityTick(LivingEvent.LivingTickEvent event) {
+        if (event.getEntity() instanceof Camel camel && !camel.level().isClientSide) {
+            if (!camel.isDashing()) {
+                if (camel.getControllingPassenger() instanceof ServerPlayer) {
+                    stopIt = true;
+                }
+            }
+            if (camel.isDashing() && camel.onGround() && camel.getJumpCooldown() > 0) {
+                if (camel.getControllingPassenger() instanceof ServerPlayer player) {
+                    if (!stopIt) {
+                        AntUtils.addToGenericQuestGoal(player, CamelJumpGoal.class);
+                    }
+                    else stopIt = false;
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void onHurt(LivingHurtEvent event) {
         if (event.getSource().getDirectEntity() instanceof ServerPlayer player) {

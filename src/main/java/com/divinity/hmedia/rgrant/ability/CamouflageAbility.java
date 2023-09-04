@@ -26,6 +26,7 @@ public class CamouflageAbility extends Ability {
                     BlockState blockState = level.getBlockState(result.getBlockPos());
                     if (!blockState.isAir()) {
                         holder.setCurrentSize(AntHolder.Size.SMALLEST);
+                        player.refreshDimensions();
                         holder.setCamouflagedBlock(blockState.getBlock());
                     }
                 }
