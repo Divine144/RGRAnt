@@ -51,7 +51,6 @@ public class MorphInit {
     ));
     public static final RegistryObject<Morph> FIRE_ANT = MORPHS.register("fire_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(40)
-            .swingDuration(7)
             .dimensions(1.5f, 1f)
             .morphedTo(entity -> {
                 AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
@@ -70,7 +69,6 @@ public class MorphInit {
     ));
     public static final RegistryObject<Morph> KING_ANT = MORPHS.register("king_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(60)
-            .swingDuration(7)
             .dimensions(2f, 1f)
             .morphedTo(entity -> {
                 AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
@@ -101,7 +99,6 @@ public class MorphInit {
     ));
     public static final RegistryObject<Morph> OMEGA_ANT = MORPHS.register("omega_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(100)
-            .swingDuration(7)
             .dimensions(2f, 4f)
             .morphedTo(entity -> {
                 AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);

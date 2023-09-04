@@ -12,6 +12,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.math.Axis;
 import dev._100media.hundredmediaabilities.capability.AbilityHolderAttacher;
 import dev._100media.hundredmediageckolib.client.animatable.IHasGeoRenderer;
 import dev._100media.hundredmediageckolib.client.animatable.MotionAttackAnimatable;
@@ -316,6 +317,8 @@ public class ClientModEvents {
                         float green = renderColor.getGreenFloat();
                         float blue = renderColor.getBlueFloat();
                         float alpha = renderColor.getAlphaFloat();
+                        float f2 = Mth.lerp(partialTick, Mth.wrapDegrees(entity.tickCount) - 1, Mth.wrapDegrees(entity.tickCount));
+                        poseStack.mulPose(Axis.YP.rotationDegrees(f2));
                         this.getRenderer().actuallyRender(poseStack, animatable, model,
                                 renderType, bufferSource, bufferSource.getBuffer(renderType), false, partialTick, packedLight,
                                 OverlayTexture.NO_OVERLAY, red, green, blue, alpha);

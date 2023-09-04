@@ -26,18 +26,4 @@ public class AntSizeUpAbility extends Ability {
         }
         super.executePressed(level, player);
     }
-
-    @Override
-    public boolean shouldCooldown(ServerLevel level, ServerPlayer player) {
-        var holder = AntHolderAttacher.getAntHolderUnwrap(player);
-        if (holder != null) {
-            return holder.getGigaAntTicks() <= 0;
-        }
-        return super.shouldCooldown(level, player);
-    }
-
-    @Override
-    public int getCooldownDuration() {
-        return 20 * 5;
-    }
 }

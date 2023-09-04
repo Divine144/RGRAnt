@@ -58,7 +58,7 @@ public class AcidProjectileEntity extends ThrowableProjectile implements GeoEnti
                         }
                     });
                 }
-                living.hurt(this.damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null), 0);
+                living.hurt(this.damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null), 1);
             }
         }
     }

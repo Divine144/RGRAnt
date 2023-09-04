@@ -49,7 +49,7 @@ public class AcidSprayItem extends Item {
                         entity.xRotO = -Mth.wrapDegrees(player.xRotO);
                         entity.yRotO = -Mth.wrapDegrees(player.yRotO);
                         player.level().addFreshEntity(entity);
-                        player.level().playSound(null, player.blockPosition(), SoundInit.ACID_SPRAY.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                        player.level().playSound(null, player.blockPosition(), SoundInit.ACID_SPRAY.get(), SoundSource.PLAYERS, 0.3f, 1f);
                     }
                 }
             }

@@ -79,7 +79,6 @@ public class SkillInit {
                     new ItemSkillRequirement(() -> Items.CREEPER_HEAD, 1),
                     new ItemSkillRequirement(() -> Items.ZOMBIE_HEAD, 1),
                     new ItemSkillRequirement(() -> Items.PIGLIN_HEAD, 1),
-                    new ItemSkillRequirement(() -> Items.DRAGON_HEAD, 1),
                     new ItemSkillRequirement(() -> Items.PLAYER_HEAD, 1) // Might not work
             ),
             MorphInit.KING_ANT
@@ -148,7 +147,7 @@ public class SkillInit {
             Component.literal("Camouflage"),
             Component.literal("""
                     Whatever block is being looked at when this ability is used; the player will turn into that block.
-                    Press the ability again to deactivate.
+                    Press the ability again to deactivate. When deactivated, you gain invisibility for 10 seconds.
                     """),
             Arrays.asList(
                     new ItemSkillRequirement(() -> Items.SEAGRASS, 16),

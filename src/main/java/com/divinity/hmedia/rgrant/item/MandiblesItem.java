@@ -38,6 +38,11 @@ public class MandiblesItem extends AnimatedSwordItem {
     }
 
     @Override
+    public boolean isDamageable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
     }
 

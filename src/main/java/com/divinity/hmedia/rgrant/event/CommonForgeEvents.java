@@ -337,7 +337,7 @@ public class CommonForgeEvents {
     }
 
     public static void playerLeftClicked(Player player) {
-        if (player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof TieredItem && player.hasEffect(EffectInit.NETTED.get())) {
+        if (player.hasEffect(EffectInit.NETTED.get())) {
             if (player.level().isClientSide) {
                 NetworkHandler.INSTANCE.sendToServer(new EscapeNetPacket());
             }
