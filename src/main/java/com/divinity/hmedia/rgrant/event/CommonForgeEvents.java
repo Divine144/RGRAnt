@@ -6,11 +6,13 @@ import com.divinity.hmedia.rgrant.cap.AntHolder;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import com.divinity.hmedia.rgrant.entity.AntEntity;
 import com.divinity.hmedia.rgrant.init.*;
+import com.divinity.hmedia.rgrant.item.MandiblesItem;
 import com.divinity.hmedia.rgrant.mixin.EntityAccessor;
 import com.divinity.hmedia.rgrant.network.serverbound.EscapeNetPacket;
 import com.divinity.hmedia.rgrant.network.NetworkHandler;
 import com.divinity.hmedia.rgrant.quest.goal.*;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import dev._100media.capabilitysyncer.core.CapabilityAttacher;
@@ -25,6 +27,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -38,6 +41,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.animal.camel.Camel;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.npc.Villager;
@@ -46,6 +50,7 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -314,37 +319,51 @@ public class CommonForgeEvents {
     @SubscribeEvent
     public static void netInteract(PlayerInteractEvent.EntityInteractSpecific event) {
         if (event.isCanceled()) return;
-
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (event.getTarget() instanceof Villager villager) {
-                if (AntUtils.hasItemEitherHands(player, ItemInit.MANDIBLES.get())) {
-                    ItemStack stack = ItemStack.EMPTY;
-                    for (InteractionHand hand : InteractionHand.values()) {
-                        if (player.getItemInHand(hand).is(ItemInit.MANDIBLES.get())) {
-                            stack = player.getItemInHand(hand);
-                            break;
-                        }
-                    }
-                    CompoundTag tag = stack.getOrCreateTag();
-                    if (tag.getInt(String.valueOf(villager.getId())) != villager.getId()) {
-                        ItemStack pickedStack = villager.getPickedResult(null);
-                        if (pickedStack != null && pickedStack.getItem() instanceof ForgeSpawnEggItem) {
-                            player.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
-                            villager.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
-                            player.level().playSound(null, villager.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
-                            tag.putInt(String.valueOf(villager.getId()), villager.getId());
-                        }
+            ItemStack stack = ItemStack.EMPTY;
+            if (AntUtils.hasItemEitherHands(player, ItemInit.MANDIBLES.get())) {
+                for (InteractionHand hand : InteractionHand.values()) {
+                    if (player.getItemInHand(hand).is(ItemInit.MANDIBLES.get())) {
+                        stack = player.getItemInHand(hand);
+                        break;
                     }
                 }
-            }
-            else if (event.getTarget() instanceof PartEntity<?> partEntity) {
-                var entity = partEntity.getParent();
-                if (entity instanceof EnderDragon enderDragon) {
-                    if (!player.getInventory().contains(Items.DRAGON_HEAD.getDefaultInstance())) {
-                        player.getInventory().add(new ItemStack(Items.DRAGON_HEAD));
-                        enderDragon.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                if (event.getTarget() instanceof LivingEntity entity) {
+                    ItemStack itemStack = MandiblesItem.getHeadForEntity(entity);
+                    CompoundTag tag = stack.getOrCreateTag();
+                    if (tag.getInt(String.valueOf(entity.getId())) != entity.getId()) {
+                        if (!itemStack.isEmpty()) {
+                            player.getInventory().add(itemStack);
+                        }
+                        else if (entity instanceof Player otherPlayer) {
+                            ItemStack playerHeadStack = new ItemStack(Items.PLAYER_HEAD);
+                            GameProfile gameprofile = otherPlayer.getGameProfile();
+                            playerHeadStack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gameprofile));
+                            player.getInventory().add(playerHeadStack);
+                            MarkerHolderAttacher.getMarkerHolder(otherPlayer).ifPresent(h -> h.addMarker(MarkerInit.MANDIBLES_MARKER.get(), false));
+                        }
+                        else {
+                            ItemStack pickedStack = entity.getPickedResult(null);
+                            if (pickedStack != null && (pickedStack.getItem() instanceof SpawnEggItem)) {
+                                player.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
+                            }
+                        }
+                        entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
                         player.level().playSound(null, player.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                        tag.putInt(String.valueOf(entity.getId()), entity.getId());
                     }
+                }
+                else if (event.getTarget() instanceof EnderDragonPart part) {
+                    var entity = part.getParent();
+                    CompoundTag tag = stack.getOrCreateTag();
+                    if (tag.getInt(String.valueOf(entity.getId())) != entity.getId()) {
+                        if (!player.getInventory().contains(Items.DRAGON_HEAD.getDefaultInstance())) {
+                            player.getInventory().add(new ItemStack(Items.DRAGON_HEAD));
+                        }
+                        tag.putInt(String.valueOf(entity.getId()), entity.getId());
+                    }
+                    entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                    player.level().playSound(null, player.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
                 }
             }
         }

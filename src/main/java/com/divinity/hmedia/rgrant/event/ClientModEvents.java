@@ -322,7 +322,6 @@ public class ClientModEvents {
                                 super.render(player, animatable1, entityYaw, partialTick, poseStack, bufferSource, packedLight);
                             }
                             poseStack.popPose();
-
                         }
                     }
                 }
