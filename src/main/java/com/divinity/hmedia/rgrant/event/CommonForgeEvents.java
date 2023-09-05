@@ -1,6 +1,7 @@
 package com.divinity.hmedia.rgrant.event;
 
 import com.divinity.hmedia.rgrant.RGRAnt;
+import com.divinity.hmedia.rgrant.ability.GigaAntAbility;
 import com.divinity.hmedia.rgrant.cap.AntHolder;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import com.divinity.hmedia.rgrant.entity.AntEntity;
@@ -262,23 +263,7 @@ public class CommonForgeEvents {
                                 p.addEffect(new MobEffectInstance(MobEffects.GLOWING, -1, 0, false,false,false));
                             });
                     if (cap.getGigaAntTicks() <= 0) {
-                        AbilityHolderAttacher.getAbilityHolder(player).ifPresent(p -> p.addCooldown(AbilityInit.GIGA_ANT.get(),  true));
-                        var reachDistance = player.getAttribute(ForgeMod.BLOCK_REACH.get());
-                        var attackDistance = player.getAttribute(ForgeMod.ENTITY_REACH.get());
-                        player.serverLevel().getPlayers(p -> p.hasEffect(MobEffects.GLOWING) && MorphHolderAttacher.getCurrentMorph(p).isEmpty())
-                                .forEach(p -> p.removeEffect(MobEffects.GLOWING));
-                        var speed = player.getEffect(MobEffects.MOVEMENT_SPEED);
-                        var dmg = player.getEffect(MobEffects.DAMAGE_BOOST);
-                        var jump = player.getEffect(MobEffects.JUMP);
-                        if (speed != null && dmg != null && jump != null) {
-                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, speed.getAmplifier() / 2, false, false ,false));
-                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
-                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
-                        }
-                        if (reachDistance != null && attackDistance != null) {
-                            reachDistance.setBaseValue(Math.max(reachDistance.getAttribute().getDefaultValue(), reachDistance.getBaseValue() - 20));
-                            attackDistance.setBaseValue(Math.max(attackDistance.getAttribute().getDefaultValue(), attackDistance.getBaseValue() - 20));
-                        }
+                        AbilityInit.GIGA_ANT.get().executePressed(player.serverLevel(), player);
                     }
                 }
                 if (cap.getCaptured() instanceof LivingEntity entity) {

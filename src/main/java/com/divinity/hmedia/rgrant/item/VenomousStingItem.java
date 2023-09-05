@@ -119,18 +119,18 @@ public class VenomousStingItem extends SimpleAnimatedItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
-        if (pLevel.isClientSide) {
-            return InteractionResultHolder.pass(itemStack);
-        }
         CompoundTag tag = itemStack.getOrCreateTag();
         if (pPlayer.isShiftKeyDown()) {
-            tag.putBoolean("yes", !tag.getBoolean("yes"));
-            pPlayer.sendSystemMessage(Component.literal("%s Mode Enabled".formatted(tag.getBoolean("yes") ? "Melee" : "Ranged")).withStyle(ChatFormatting.GREEN));
-        }
-        if (tag.getBoolean("yes")) {
+            if (!pLevel.isClientSide) {
+                tag.putBoolean("yes", !tag.getBoolean("yes"));
+                pPlayer.sendSystemMessage(Component.literal("%s Mode Enabled".formatted(tag.getBoolean("yes") ? "Melee" : "Ranged")).withStyle(ChatFormatting.GREEN));
+            }
             return InteractionResultHolder.pass(itemStack);
         }
-        return ItemUtils.startUsingInstantly(pLevel, pPlayer, pUsedHand);
+        if (!tag.getBoolean("yes") && !pPlayer.getUseItem().is(Items.SHIELD)) {
+            return ItemUtils.startUsingInstantly(pLevel, pPlayer, pUsedHand);
+        }
+        return InteractionResultHolder.pass(itemStack);
     }
 
     @Override

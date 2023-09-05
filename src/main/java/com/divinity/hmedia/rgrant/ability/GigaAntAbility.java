@@ -3,6 +3,7 @@ package com.divinity.hmedia.rgrant.ability;
 import com.divinity.hmedia.rgrant.cap.AntHolderAttacher;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
 import dev._100media.hundredmediaabilities.ability.Ability;
+import dev._100media.hundredmediaabilities.capability.AbilityHolderAttacher;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,9 +28,9 @@ public class GigaAntAbility extends Ability {
                 var dmg = player.getEffect(MobEffects.DAMAGE_BOOST);
                 var jump = player.getEffect(MobEffects.JUMP);
                 if (speed != null && dmg != null && jump != null) {
-                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, speed.getAmplifier() + speed.getAmplifier(), false, false ,false));
-                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() + dmg.getAmplifier(), false, false ,false));
-                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() + dmg.getAmplifier(), false, false ,false));
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, speed.getAmplifier() * 2 + 1, false, false ,false));
+                    player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, dmg.getAmplifier() * 2 + 1, false, false ,false));
+                    player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, jump.getAmplifier() * 2 + 1, false, false ,false));
                 }
                 if (reachDistance != null && attackDistance != null) {
                     reachDistance.setBaseValue(reachDistance.getBaseValue() + 20);
@@ -44,9 +45,12 @@ public class GigaAntAbility extends Ability {
                 var dmg = player.getEffect(MobEffects.DAMAGE_BOOST);
                 var jump = player.getEffect(MobEffects.JUMP);
                 if (speed != null && dmg != null && jump != null) {
+                    player.removeEffect(MobEffects.MOVEMENT_SPEED);
                     player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, speed.getAmplifier() / 2, false, false ,false));
-                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
-                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
+                    player.removeEffect(MobEffects.DAMAGE_BOOST);
+                    player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, -1, dmg.getAmplifier() / 2, false, false ,false));
+                    player.removeEffect(MobEffects.JUMP);
+                    player.addEffect(new MobEffectInstance(MobEffects.JUMP, -1, jump.getAmplifier() / 2, false, false ,false));
                 }
                 if (reachDistance != null && attackDistance != null) {
                     reachDistance.setBaseValue(Math.max(reachDistance.getAttribute().getDefaultValue(), reachDistance.getBaseValue() - 20));
@@ -64,6 +68,6 @@ public class GigaAntAbility extends Ability {
 
     @Override
     public int getCooldownDuration() {
-        return 20 * 60;
+        return 20;
     }
 }

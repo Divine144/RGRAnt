@@ -65,8 +65,9 @@ public class MandiblesItem extends AnimatedSwordItem {
     @Override
     public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity entity, InteractionHand hand) {
         if (entity.level().isClientSide) return InteractionResult.SUCCESS;
+        ItemStack actualStack = playerIn.getItemInHand(hand);
         ItemStack itemStack = getHeadForEntity(entity);
-        CompoundTag tag = itemStack.getOrCreateTag();
+        CompoundTag tag = actualStack.getOrCreateTag();
         if (!itemStack.isEmpty()) {
             if (tag.getInt(String.valueOf(entity.getId())) != entity.getId()) {
                 playerIn.getInventory().add(itemStack);
