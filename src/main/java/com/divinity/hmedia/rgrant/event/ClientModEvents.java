@@ -125,7 +125,7 @@ public class ClientModEvents {
             protected PlayState motionAnimationEvent(AnimationState<? extends MotionAttackAnimatable> state) {
                 AnimationController<?> controller = state.getController();
                 if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {
-                    controller.transitionLength(5);
+                    controller.transitionLength(0);
                     if (state.isMoving()) {
                         if (player.isSprinting()) {
                             controller.setAnimation(!player.isCrouching() ? RUN : CROUCH_FOR_WALK);

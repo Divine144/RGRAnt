@@ -153,20 +153,6 @@ public class CommonForgeEvents {
     @SubscribeEvent
     public static void onJoinLevel(EntityJoinLevelEvent event) {
         if (event.getEntity() instanceof ServerPlayer entity) {
-            var optional = entity.serverLevel().players()
-                    .stream()
-                    .filter(p ->
-                        MorphHolderAttacher.getCurrentMorph(p).isPresent() &&
-                        AntHolderAttacher.getAntHolder(p).filter(m -> m.getGigaAntTicks() > 0).isPresent())
-                    .findAny();
-            if (optional.isPresent()) {
-                entity.serverLevel().players()
-                    .stream()
-                    .filter(p -> MorphHolderAttacher.getCurrentMorph(p).isEmpty())
-                    .forEach(p -> {
-                        p.addEffect(new MobEffectInstance(MobEffects.GLOWING, -1, 0, false, false ,false));
-                    });
-            }
             var morph = MorphHolderAttacher.getCurrentMorphUnwrap(entity);
             if (morph != null) {
                 if (morph == MorphInit.BABY_ANT.get()) {
@@ -268,12 +254,31 @@ public class CommonForgeEvents {
                         player.attack(target);
                         player.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
                     }
+                    player.serverLevel()
+                            .players()
+                            .stream()
+                            .filter(p -> MorphHolderAttacher.getCurrentMorph(p).isEmpty() && !p.hasEffect(MobEffects.GLOWING))
+                            .forEach(p -> {
+                                p.addEffect(new MobEffectInstance(MobEffects.GLOWING, -1, 0, false,false,false));
+                            });
                     if (cap.getGigaAntTicks() <= 0) {
-                        AbilityHolderAttacher.getAbilityHolder(player).ifPresent(p ->  {
-                            if (p.isAbilityActive(AbilityInit.GIGA_ANT.get())) {
-                                AbilityInit.GIGA_ANT.get().executeToggle(player.serverLevel(), player, false);
-                            }
-                        });
+                        AbilityHolderAttacher.getAbilityHolder(player).ifPresent(p -> p.addCooldown(AbilityInit.GIGA_ANT.get(),  true));
+                        var reachDistance = player.getAttribute(ForgeMod.BLOCK_REACH.get());
+                        var attackDistance = player.getAttribute(ForgeMod.ENTITY_REACH.get());
+                        player.serverLevel().getPlayers(p -> p.hasEffect(MobEffects.GLOWING) && MorphHolderAttacher.getCurrentMorph(p).isEmpty())
+                                .forEach(p -> p.removeEffect(MobEffects.GLOWING));
+                        var speed = player.getEffect(MobEffects.MOVEMENT_SPEED);
+                        var dmg = player.getEffect(MobEffects.DAMAGE_BOOST);
+                        var jump = player.getEffect(MobEffects.JUMP);
+                        if (speed != null && dmg != null && jump != null) {
+                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, speed.getAmplifier() / 2, false, false ,false));
+                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
+                            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, -1, dmg.getAmplifier() / 2, false, false ,false));
+                        }
+                        if (reachDistance != null && attackDistance != null) {
+                            reachDistance.setBaseValue(Math.max(reachDistance.getAttribute().getDefaultValue(), reachDistance.getBaseValue() - 20));
+                            attackDistance.setBaseValue(Math.max(attackDistance.getAttribute().getDefaultValue(), attackDistance.getBaseValue() - 20));
+                        }
                     }
                 }
                 if (cap.getCaptured() instanceof LivingEntity entity) {

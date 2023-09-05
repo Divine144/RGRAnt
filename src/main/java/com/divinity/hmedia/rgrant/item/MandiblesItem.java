@@ -66,32 +66,38 @@ public class MandiblesItem extends AnimatedSwordItem {
     public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity entity, InteractionHand hand) {
         if (entity.level().isClientSide) return InteractionResult.SUCCESS;
         ItemStack itemStack = getHeadForEntity(entity);
+        CompoundTag tag = itemStack.getOrCreateTag();
         if (!itemStack.isEmpty()) {
-            if (!playerIn.getInventory().contains(itemStack)) {
+            if (tag.getInt(String.valueOf(entity.getId())) != entity.getId()) {
                 playerIn.getInventory().add(itemStack);
                 entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
                 playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                tag.putInt(String.valueOf(entity.getId()), entity.getId());
             }
             return InteractionResult.SUCCESS;
         }
         else if (entity instanceof Player player) {
-            ItemStack playerHeadStack = new ItemStack(Items.PLAYER_HEAD);
-            GameProfile gameprofile = player.getGameProfile();
-            playerHeadStack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gameprofile));
-            if (!playerIn.getInventory().contains(playerHeadStack)) {
+            if (tag.getInt(String.valueOf(entity.getId())) != entity.getId()) {
+                ItemStack playerHeadStack = new ItemStack(Items.PLAYER_HEAD);
+                GameProfile gameprofile = player.getGameProfile();
+                playerHeadStack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), gameprofile));
                 playerIn.getInventory().add(playerHeadStack);
                 MarkerHolderAttacher.getMarkerHolder(player).ifPresent(h -> h.addMarker(MarkerInit.MANDIBLES_MARKER.get(), false));
                 player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
                 playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                tag.putInt(String.valueOf(entity.getId()), entity.getId());
             }
             return InteractionResult.SUCCESS;
         }
         else {
-            ItemStack pickedStack = entity.getPickedResult(null);
-            if (pickedStack != null && pickedStack.getItem() instanceof ForgeSpawnEggItem) {
-                playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
-                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
-                playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            if (tag.getInt(String.valueOf(entity.getId())) != entity.getId()) {
+                ItemStack pickedStack = entity.getPickedResult(null);
+                if (pickedStack != null && pickedStack.getItem() instanceof ForgeSpawnEggItem) {
+                    playerIn.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
+                    entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                    playerIn.level().playSound(null, playerIn.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                    tag.putInt(String.valueOf(entity.getId()), entity.getId());
+                }
             }
         }
         return InteractionResult.CONSUME;

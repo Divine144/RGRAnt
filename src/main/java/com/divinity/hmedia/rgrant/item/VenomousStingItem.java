@@ -9,9 +9,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import dev._100media.hundredmediageckolib.item.animated.AnimatedItemProperties;
 import dev._100media.hundredmediageckolib.item.animated.SimpleAnimatedItem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -54,28 +57,26 @@ public class VenomousStingItem extends SimpleAnimatedItem {
     }
 
     @Override
-    public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration) {
+    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged) {
         if (pLivingEntity instanceof Player player) {
-            int i = this.getUseDuration(pStack) - pRemainingUseDuration;
+            int i = this.getUseDuration(pStack) - pTimeCharged;
             if (i < 0) return;
-            if (pRemainingUseDuration % 10 == 0) {
-                if (!pLevel.isClientSide) {
-                    var entity = EntityInit.STINGER_ENTITY.get().create(pLevel);
-                    if (entity != null) {
-                        entity.setPos(player.getX(), player.getEyeY() - 0.15, player.getZ());
-                        entity.setOwner(player);
-                        entity.setNoGravity(true);
-                        entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 1.5F, 0);
-                        entity.setYRot(-Mth.wrapDegrees(player.getYRot()));
-                        entity.setXRot(-Mth.wrapDegrees(player.getXRot()));
-                        entity.xRotO = -Mth.wrapDegrees(player.xRotO);
-                        entity.yRotO = -Mth.wrapDegrees(player.yRotO);
-                        player.level().addFreshEntity(entity);
-                    }
+            if (!pLevel.isClientSide) {
+                var entity = EntityInit.STINGER_ENTITY.get().create(pLevel);
+                if (entity != null) {
+                    entity.setPos(player.getX(), player.getEyeY() - 0.15, player.getZ());
+                    entity.setOwner(player);
+                    entity.setNoGravity(true);
+                    entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 1.5F, 0);
+                    entity.setYRot(-Mth.wrapDegrees(player.getYRot()));
+                    entity.setXRot(-Mth.wrapDegrees(player.getXRot()));
+                    entity.xRotO = -Mth.wrapDegrees(player.xRotO);
+                    entity.yRotO = -Mth.wrapDegrees(player.yRotO);
+                    player.level().addFreshEntity(entity);
                 }
-                player.level().playSound(null, player.blockPosition(), SoundInit.STING.get(), SoundSource.PLAYERS, 0.5f, 1f);
-                player.awardStat(Stats.ITEM_USED.get(this));
             }
+            player.level().playSound(null, player.blockPosition(), SoundInit.STING.get(), SoundSource.PLAYERS, 0.5f, 1f);
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
 
@@ -119,7 +120,15 @@ public class VenomousStingItem extends SimpleAnimatedItem {
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            return InteractionResultHolder.consume(itemStack);
+            return InteractionResultHolder.pass(itemStack);
+        }
+        CompoundTag tag = itemStack.getOrCreateTag();
+        if (pPlayer.isShiftKeyDown()) {
+            tag.putBoolean("yes", !tag.getBoolean("yes"));
+            pPlayer.sendSystemMessage(Component.literal("%s Mode Enabled".formatted(tag.getBoolean("yes") ? "Melee" : "Ranged")).withStyle(ChatFormatting.GREEN));
+        }
+        if (tag.getBoolean("yes")) {
+            return InteractionResultHolder.pass(itemStack);
         }
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pUsedHand);
     }

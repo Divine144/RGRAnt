@@ -102,7 +102,7 @@ public class MorphInit {
     ));
     public static final RegistryObject<Morph> OMEGA_ANT = MORPHS.register("omega_ant", () -> new Morph(new Morph.Properties<>()
             .maxHealth(100)
-            .swingDuration(14)
+            .swingDuration(20)
             .dimensions(2f, 4f)
             .morphedTo(entity -> {
                 AntHolderAttacher.getAntHolder(entity).ifPresent(AntHolder::resetCurrentSize);
