@@ -127,6 +127,22 @@ public class CommonForgeEvents {
                 });
             }
         }
+        if (event.getEntity() instanceof ServerPlayer player) {
+            MarkerHolderAttacher.getMarkerHolder(player).ifPresent(p -> {
+                player.serverLevel()
+                    .players()
+                    .forEach(serverPlayer -> {
+                        for (ItemStack stack : serverPlayer.getInventory().items) {
+                            if (stack.getItem() instanceof MandiblesItem) {
+                                if (stack.getOrCreateTag().getInt(String.valueOf(player.getId())) == player.getId()) {
+                                    stack.getOrCreateTag().remove(String.valueOf(player.getId()));
+                                    break;
+                                }
+                            }
+                        }
+                    });
+            });
+        }
         if (event.getSource().getEntity() instanceof ServerPlayer player && event.getSource().is(DamageTypes.PLAYER_EXPLOSION)) {
             AntUtils.addToGenericQuestGoal(player, AntArmyKillEndermanGoal.class);
         }
@@ -348,10 +364,10 @@ public class CommonForgeEvents {
                                 player.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
                             }
                         }
-                        entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
-                        player.level().playSound(null, player.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
                         tag.putInt(String.valueOf(entity.getId()), entity.getId());
                     }
+                    entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                    player.level().playSound(null, player.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
                 }
                 else if (event.getTarget() instanceof EnderDragonPart part) {
                     var entity = part.getParent();
