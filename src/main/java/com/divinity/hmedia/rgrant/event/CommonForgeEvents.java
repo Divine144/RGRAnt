@@ -284,7 +284,7 @@ public class CommonForgeEvents {
                         movement = accessor.invokeCollide(movement);
                     }
                     var pos = entity.position().add(movement);
-                    entity.moveTo(pos);
+                    entity.teleportTo(pos.x, pos.y, pos.z);
                     entity.hurtMarked = true;
                     entity.fallDistance = 0;
                 }
@@ -302,8 +302,9 @@ public class CommonForgeEvents {
         if (event instanceof PlayerInteractEvent.LeftClickBlock || event instanceof PlayerInteractEvent.LeftClickEmpty) return;
         if (event.getEntity().isShiftKeyDown()) return;
         AntHolderAttacher.getAntHolder(event.getEntity()).ifPresent(holder -> {
-            if (holder.getCaptured() instanceof LivingEntity) {
+            if (holder.getCaptured() instanceof LivingEntity living) {
                 holder.unCapture();
+                holder.capture(living);
                 event.setCancellationResult(InteractionResult.SUCCESS);
                 event.setCanceled(true);
             }
