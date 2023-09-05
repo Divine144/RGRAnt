@@ -122,6 +122,19 @@ public class ClientModEvents {
             private static final RawAnimation CROUCH_FOR_WALK = RawAnimation.begin().thenLoop("crouchwalk");
 
             @Override
+            protected PlayState attackAnimationEvent(AnimationState<? extends MotionAttackAnimatable> state) {
+                AnimationController<?> controller = state.getController();
+                if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {
+                    controller.transitionLength(0);
+                    if (player.swingTime > 0) {
+                        controller.setAnimation(ATTACK);
+                        return PlayState.CONTINUE;
+                    }
+                }
+                return PlayState.STOP;
+            }
+
+            @Override
             protected PlayState motionAnimationEvent(AnimationState<? extends MotionAttackAnimatable> state) {
                 AnimationController<?> controller = state.getController();
                 if (state.getData(DataTickets.ENTITY) instanceof AbstractClientPlayer player) {

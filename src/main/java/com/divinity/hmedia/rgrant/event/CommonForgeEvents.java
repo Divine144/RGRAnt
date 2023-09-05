@@ -13,8 +13,10 @@ import com.divinity.hmedia.rgrant.quest.goal.*;
 import com.divinity.hmedia.rgrant.utils.AntUtils;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import dev._100media.capabilitysyncer.core.CapabilityAttacher;
 import dev._100media.hundredmediaabilities.capability.AbilityHolderAttacher;
 import dev._100media.hundredmediaabilities.capability.MarkerHolderAttacher;
+import dev._100media.hundredmediamorphs.capability.AnimationHolderAttacher;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import dev._100media.hundredmediaquests.cap.QuestHolderAttacher;
 import dev._100media.hundredmediaquests.goal.KillPlayersGoal;
@@ -22,6 +24,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -48,6 +51,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.entity.PartEntity;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -313,9 +317,23 @@ public class CommonForgeEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (event.getTarget() instanceof Villager villager) {
                 if (AntUtils.hasItemEitherHands(player, ItemInit.MANDIBLES.get())) {
-                    player.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
-                    villager.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
-                    player.level().playSound(null, player.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                    ItemStack stack = ItemStack.EMPTY;
+                    for (InteractionHand hand : InteractionHand.values()) {
+                        if (player.getItemInHand(hand).is(ItemInit.MANDIBLES.get())) {
+                            stack = player.getItemInHand(hand);
+                            break;
+                        }
+                    }
+                    CompoundTag tag = stack.getOrCreateTag();
+                    if (tag.getInt(String.valueOf(villager.getId())) != villager.getId()) {
+                        ItemStack pickedStack = villager.getPickedResult(null);
+                        if (pickedStack != null && pickedStack.getItem() instanceof ForgeSpawnEggItem) {
+                            player.getInventory().add(new ItemStack(Items.PLAYER_HEAD));
+                            villager.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200, 0));
+                            player.level().playSound(null, villager.blockPosition(), SoundInit.MANDIBLES.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                            tag.putInt(String.valueOf(villager.getId()), villager.getId());
+                        }
+                    }
                 }
             }
             else if (event.getTarget() instanceof PartEntity<?> partEntity) {

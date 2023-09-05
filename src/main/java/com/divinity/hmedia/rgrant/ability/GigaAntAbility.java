@@ -7,6 +7,7 @@ import dev._100media.hundredmediaabilities.capability.AbilityHolderAttacher;
 import dev._100media.hundredmediamorphs.capability.MorphHolderAttacher;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -68,6 +69,6 @@ public class GigaAntAbility extends Ability {
 
     @Override
     public int getCooldownDuration() {
-        return 20;
+        return 20 * 60;
     }
 }

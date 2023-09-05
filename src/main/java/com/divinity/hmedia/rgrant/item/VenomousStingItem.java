@@ -61,6 +61,7 @@ public class VenomousStingItem extends SimpleAnimatedItem {
         if (pLivingEntity instanceof Player player) {
             int i = this.getUseDuration(pStack) - pTimeCharged;
             if (i < 0) return;
+            float f = BowItem.getPowerForTime(i);
             if (!pLevel.isClientSide) {
                 var entity = EntityInit.STINGER_ENTITY.get().create(pLevel);
                 if (entity != null) {
@@ -72,6 +73,7 @@ public class VenomousStingItem extends SimpleAnimatedItem {
                     entity.setXRot(-Mth.wrapDegrees(player.getXRot()));
                     entity.xRotO = -Mth.wrapDegrees(player.xRotO);
                     entity.yRotO = -Mth.wrapDegrees(player.yRotO);
+                    entity.setDamage((int) (f * 15));
                     player.level().addFreshEntity(entity);
                 }
             }

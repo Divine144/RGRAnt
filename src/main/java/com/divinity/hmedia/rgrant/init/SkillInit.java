@@ -219,7 +219,8 @@ public class SkillInit {
             Arrays.asList(
                     new ItemSkillRequirement(() -> Items.DRAGON_EGG, 1),
                     new ItemSkillRequirement(() -> Items.WITHER_SKELETON_SKULL, 3),
-                    new ItemSkillRequirement(() -> Items.SHULKER_BOX, 3)
+                    new ItemSkillRequirement(() -> Items.SHULKER_BOX, 3),
+                    new ItemSkillRequirement(() -> Items.DRAGON_HEAD, 1)
             ),
             player -> {
                 unlockAbility(player, AbilityInit.GIGA_ANT.get());

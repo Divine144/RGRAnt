@@ -17,6 +17,8 @@ public class StingerProjectileEntity extends ThrowableProjectile implements GeoE
 
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
+    private int damage = 4;
+
     public StingerProjectileEntity(EntityType<? extends ThrowableProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -47,7 +49,7 @@ public class StingerProjectileEntity extends ThrowableProjectile implements GeoE
                 if (!living.hasEffect(MobEffects.CONFUSION)) {
                     living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0, false, false, false));
                 }
-                living.hurt(this.damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null), 4);
+                living.hurt(this.damageSources().mobProjectile(this, getOwner() instanceof LivingEntity l ? l : null), damage);
             }
         }
     }
@@ -65,5 +67,9 @@ public class StingerProjectileEntity extends ThrowableProjectile implements GeoE
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return geoCache;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
     }
 }
