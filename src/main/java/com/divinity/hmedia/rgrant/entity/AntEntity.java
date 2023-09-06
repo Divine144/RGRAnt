@@ -159,6 +159,11 @@ public class AntEntity extends PathfinderMob implements GeoEntity {
     }
 
     @Override
+    public boolean isPersistenceRequired() {
+        return true;
+    }
+
+    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return geoCache;
     }
